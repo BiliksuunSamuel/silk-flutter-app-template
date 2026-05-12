@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter --version)",
+      "Bash(flutter pub *)",
+      "Bash(dart run *)",
+      "Bash(grep -n 'class _$AuthResponse\\\\|class AuthResponse\\\\|_AuthResponse' /Users/bhills/Desktop/MobileAppProjects/silk/lib/features/auth/data/models/auth_response.freezed.dart)"
+    ]
+  }
+}
