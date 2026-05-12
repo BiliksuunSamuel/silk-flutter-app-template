@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:silk/core/error/app_failure.dart';
 import 'package:silk/core/motion/motion_tokens.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
-import 'package:silk/features/auth/presentation/providers/auth_controller.dart';
+import 'package:silk/features/auth/domain/session.dart';
+import 'package:silk/features/auth/presentation/providers/session_provider.dart';
 import 'package:silk/features/auth/presentation/widgets/otp_input.dart';
 import 'package:silk/shared/widgets/silk_app_bar.dart';
 import 'package:silk/shared/widgets/silk_button.dart';
@@ -18,39 +20,31 @@ class OtpScreen extends ConsumerStatefulWidget {
 class _OtpScreenState extends ConsumerState<OtpScreen> {
   String _otp = '';
   String? _error;
-  String _phone = '';
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final extra = ModalRoute.of(context)?.settings.arguments;
-    if (extra is String) _phone = extra;
-  }
+  bool _loading = false;
 
   Future<void> _submit() async {
     if (_otp.length < 6) {
       setState(() => _error = 'Please enter the 6-digit code.');
       return;
     }
-
-    setState(() => _error = null);
-    await ref
-        .read(authControllerProvider.notifier)
-        .verifyOtp(phone: _phone, otp: _otp);
+    setState(() {
+      _error = null;
+      _loading = true;
+    });
+    // Template demo: skip real OTP verification, set a stub session.
+    // Replace with the block below for production:
+    //   await ref.read(authControllerProvider.notifier).verifyOtp(phone: _phone, otp: _otp);
+    await Future<void>.delayed(const Duration(milliseconds: 600));
+    if (!mounted) return;
+    await ref.read(sessionNotifierProvider.notifier).setSession(
+      const Session(userId: 'demo', accessToken: 'demo', refreshToken: 'demo'),
+    );
+    if (mounted) setState(() => _loading = false);
   }
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
-    final authState = ref.watch(authControllerProvider);
-
-    ref.listen(authControllerProvider, (_, state) {
-      state.whenOrNull(
-        error: (e, __) => setState(
-          () => _error = e is AppFailure ? e.userMessage : e.toString(),
-        ),
-      );
-    });
 
     return Scaffold(
       backgroundColor: tokens.surface,
@@ -91,12 +85,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               AnimatedSwitcher(
                 duration: MotionTokens.fast,
                 child: SilkButton(
-                  key: ValueKey(authState.isLoading),
+                  key: ValueKey(_loading),
                   label: 'Verify',
-                  onPressed: authState.isLoading || _otp.length < 6
-                      ? null
-                      : _submit,
-                  isLoading: authState.isLoading,
+                  onPressed: _loading || _otp.length < 6 ? null : () => unawaited(_submit()),
+                  isLoading: _loading,
                 ),
               ),
               const Spacer(flex: 2),

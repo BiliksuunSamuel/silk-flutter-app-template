@@ -1,50 +1,1137 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
-import 'package:silk/features/auth/presentation/providers/auth_controller.dart';
+import 'package:silk/core/theme/theme_mode_provider.dart';
+import 'package:silk/features/auth/presentation/providers/session_provider.dart';
 import 'package:silk/shared/widgets/silk_app_bar.dart';
+import 'package:silk/shared/widgets/silk_avatar.dart';
+import 'package:silk/shared/widgets/silk_badge.dart';
+import 'package:silk/shared/widgets/silk_bottom_nav_bar.dart';
+import 'package:silk/shared/widgets/silk_bottom_sheet.dart';
 import 'package:silk/shared/widgets/silk_button.dart';
+import 'package:silk/shared/widgets/silk_calendar.dart';
+import 'package:silk/shared/widgets/silk_checkbox.dart';
+import 'package:silk/shared/widgets/silk_chip.dart';
+import 'package:silk/shared/widgets/silk_context_menu.dart';
+import 'package:silk/shared/widgets/silk_date_picker.dart';
+import 'package:silk/shared/widgets/silk_date_time_picker.dart';
+import 'package:silk/shared/widgets/silk_divider.dart';
+import 'package:silk/shared/widgets/silk_dropdown.dart';
+import 'package:silk/shared/widgets/silk_empty_state.dart';
+import 'package:silk/shared/widgets/silk_icon_button.dart';
+import 'package:silk/shared/widgets/silk_list_tile.dart';
+import 'package:silk/shared/widgets/silk_multi_value_select_input.dart';
+import 'package:silk/shared/widgets/silk_progress_bar.dart';
+import 'package:silk/shared/widgets/silk_pull_to_refresh.dart';
+import 'package:silk/shared/widgets/silk_radio_group.dart';
+import 'package:silk/shared/widgets/silk_reaction_burst.dart';
+import 'package:silk/shared/widgets/silk_search_bar.dart';
+import 'package:silk/shared/widgets/silk_segmented_control.dart';
+import 'package:silk/shared/widgets/silk_shimmer.dart';
+import 'package:silk/shared/widgets/silk_skeleton.dart';
+import 'package:silk/shared/widgets/silk_switch.dart';
+import 'package:silk/shared/widgets/silk_text_field.dart';
+import 'package:silk/shared/widgets/silk_time_picker.dart';
+import 'package:silk/shared/widgets/silk_toast.dart';
 
-class HomeStubScreen extends ConsumerWidget {
+class HomeStubScreen extends ConsumerStatefulWidget {
   const HomeStubScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeStubScreen> createState() => _HomeStubScreenState();
+}
+
+class _HomeStubScreenState extends ConsumerState<HomeStubScreen> {
+  final _textController = TextEditingController();
+
+  DateTime? _date;
+  TimeOfDay? _time;
+  DateTime? _dateTime;
+  DateTime? _calendarDate;
+  String? _dropdownValue;
+  List<String> _multiValues = [];
+
+  bool _switchOn = false;
+  bool _checkboxA = false;
+  bool _checkboxB = true;
+  String _segment = 'week';
+  String? _radioValue;
+  double _progressValue = 0.35;
+  int _navIndex = 1;
+  final _searchController = TextEditingController();
+
+  static final _countries = [
+    const SilkSelectItem(value: 'ng', label: 'Nigeria'),
+    const SilkSelectItem(value: 'us', label: 'United States'),
+    const SilkSelectItem(value: 'gb', label: 'United Kingdom'),
+    const SilkSelectItem(value: 'de', label: 'Germany'),
+    const SilkSelectItem(value: 'fr', label: 'France'),
+    const SilkSelectItem(value: 'jp', label: 'Japan'),
+  ];
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleRefresh() async {
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final tokens = context.tokens;
 
     return Scaffold(
       backgroundColor: tokens.surface,
-      appBar: const SilkAppBar(title: 'Home', showBackButton: false),
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.all(tokens.spaceLg),
-          child: Column(
+      appBar: SilkAppBar(
+        title: 'Silk UI Kit',
+        showBackButton: false,
+        actions: [
+          SilkIconButton(
+            icon: Icons.logout_outlined,
+            onPressed: () =>
+                ref.read(sessionNotifierProvider.notifier).clearSession(),
+            variant: SilkIconButtonVariant.subtle,
+            tooltip: 'Sign out',
+          ),
+        ],
+      ),
+      body: SilkPullToRefresh(
+        onRefresh: _handleRefresh,
+        child: ListView(
+          padding: EdgeInsets.only(bottom: tokens.spaceXxl),
+          children: [
+            // ── Intro ──────────────────────────────────────────────────────
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                tokens.spaceLg,
+                tokens.spaceLg,
+                tokens.spaceLg,
+                tokens.spaceSm,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Component showcase', style: tokens.displayStyle),
+                  SizedBox(height: tokens.spaceXs),
+                  Text(
+                    'Every Silk* widget — interactive, token-driven, ready to use.',
+                    style: tokens.bodyStyle
+                        .copyWith(color: tokens.onSurfaceMuted),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Buttons ────────────────────────────────────────────────────
+            _Section(title: 'Buttons', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: Wrap(
+                spacing: tokens.spaceSm,
+                runSpacing: tokens.spaceSm,
+                children: [
+                  SilkButton(label: 'Primary', onPressed: () {}),
+                  SilkButton(
+                    label: 'Secondary',
+                    variant: SilkButtonVariant.secondary,
+                    onPressed: () {},
+                  ),
+                  SilkButton(
+                    label: 'Ghost',
+                    variant: SilkButtonVariant.ghost,
+                    onPressed: () {},
+                  ),
+                  SilkButton(
+                    label: 'Destructive',
+                    variant: SilkButtonVariant.destructive,
+                    onPressed: () {},
+                  ),
+                  const SilkButton(
+                    label: 'Loading',
+                    onPressed: null,
+                    isLoading: true,
+                  ),
+                  const SilkButton(
+                    label: 'Disabled',
+                    onPressed: null,
+                  ),
+                  SilkButton(
+                    label: 'With icon',
+                    onPressed: () {},
+                    icon: const Icon(Icons.send_outlined),
+                  ),
+                ],
+              ),
+            )),
+
+            // ── Icon Buttons ───────────────────────────────────────────────
+            _Section(title: 'Icon Buttons', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: tokens.spaceSm,
+                    runSpacing: tokens.spaceSm,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      SilkIconButton(
+                        icon: Icons.add,
+                        onPressed: () {},
+                        variant: SilkIconButtonVariant.primary,
+                      ),
+                      SilkIconButton(
+                        icon: Icons.add,
+                        onPressed: () {},
+                        variant: SilkIconButtonVariant.ghost,
+                      ),
+                      SilkIconButton(
+                        icon: Icons.add,
+                        onPressed: () {},
+                        variant: SilkIconButtonVariant.subtle,
+                      ),
+                      SilkIconButton(
+                        icon: Icons.delete_outline,
+                        onPressed: () {},
+                        variant: SilkIconButtonVariant.destructive,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: tokens.spaceSm),
+                  Wrap(
+                    spacing: tokens.spaceSm,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      SilkIconButton(
+                        icon: Icons.star_outline,
+                        onPressed: () {},
+                        size: SilkIconButtonSize.sm,
+                      ),
+                      SilkIconButton(
+                        icon: Icons.star_outline,
+                        onPressed: () {},
+                        size: SilkIconButtonSize.md,
+                      ),
+                      SilkIconButton(
+                        icon: Icons.star_outline,
+                        onPressed: () {},
+                        size: SilkIconButtonSize.lg,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )),
+
+            // ── Text Field ─────────────────────────────────────────────────
+            _Section(title: 'Text Field', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: SilkTextField(
+                hint: 'Type something…',
+                controller: _textController,
+                textInputAction: TextInputAction.done,
+              ),
+            )),
+
+            // ── Dropdown ───────────────────────────────────────────────────
+            _Section(title: 'Dropdown', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: SilkDropdown<String>(
+                items: _countries,
+                value: _dropdownValue,
+                label: 'Country',
+                hint: 'Select a country',
+                onChanged: (v) => setState(() => _dropdownValue = v),
+              ),
+            )),
+
+            // ── Multi-select ───────────────────────────────────────────────
+            _Section(title: 'Multi-select', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: SilkMultiValueSelectInput<String>(
+                items: _countries,
+                selectedValues: _multiValues,
+                label: 'Countries visited',
+                hint: 'Select countries',
+                onChanged: (v) => setState(() => _multiValues = v),
+              ),
+            )),
+
+            // ── Date Picker ────────────────────────────────────────────────
+            _Section(title: 'Date Picker', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: SilkDatePicker(
+                selectedDate: _date,
+                label: 'Date',
+                onChanged: (d) => setState(() => _date = d),
+              ),
+            )),
+
+            // ── Time Picker ────────────────────────────────────────────────
+            _Section(title: 'Time Picker', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: SilkTimePicker(
+                selectedTime: _time,
+                label: 'Time',
+                onChanged: (t) => setState(() => _time = t),
+              ),
+            )),
+
+            // ── Date & Time Picker ─────────────────────────────────────────
+            _Section(title: 'Date & Time Picker', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: SilkDateTimePicker(
+                selectedDateTime: _dateTime,
+                label: 'Scheduled at',
+                onChanged: (dt) => setState(() => _dateTime = dt),
+              ),
+            )),
+
+            // ── Calendar ───────────────────────────────────────────────────
+            _Section(title: 'Calendar', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: SilkCalendar(
+                selectedDate: _calendarDate,
+                highlightedDates: [
+                  DateTime.now().add(const Duration(days: 3)),
+                  DateTime.now().add(const Duration(days: 7)),
+                  DateTime.now().add(const Duration(days: 12)),
+                ],
+                onDateSelected: (d) => setState(() => _calendarDate = d),
+              ),
+            )),
+
+            // ── Avatars ────────────────────────────────────────────────────
+            _Section(title: 'Avatars', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: Wrap(
+                spacing: tokens.spaceMd,
+                runSpacing: tokens.spaceMd,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  const SilkAvatar(size: 56, initials: 'AS'),
+                  SilkAvatar(
+                    size: 56,
+                    initials: 'BH',
+                    color: tokens.success,
+                  ),
+                  const SilkAvatar(size: 40, initials: 'CK'),
+                  const SilkAvatar(size: 32, initials: 'DM'),
+                  const Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      SilkAvatar(size: 56, initials: 'EF'),
+                      Positioned(
+                        right: -2,
+                        top: -2,
+                        child: SilkBadge.count(count: 5),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )),
+
+            // ── Badges ─────────────────────────────────────────────────────
+            _Section(title: 'Badges', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: Wrap(
+                spacing: tokens.spaceSm,
+                runSpacing: tokens.spaceSm,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: const [
+                  SilkBadge(label: 'Accent'),
+                  SilkBadge(label: 'Success', variant: SilkBadgeVariant.success),
+                  SilkBadge(label: 'Danger', variant: SilkBadgeVariant.danger),
+                  SilkBadge(label: 'Muted', variant: SilkBadgeVariant.muted),
+                  SilkBadge.count(count: 99),
+                ],
+              ),
+            )),
+
+            // ── List Tiles ─────────────────────────────────────────────────
+            _Section(title: 'List Tiles', child: Column(
+              children: [
+                SilkListTile(
+                  leading: Icon(Icons.person_outline,
+                      color: context.tokens.onSurfaceMuted),
+                  title: Text('Profile', style: tokens.bodyStyle),
+                  subtitle: Text('Edit your information',
+                      style: tokens.captionStyle
+                          .copyWith(color: tokens.onSurfaceMuted)),
+                  trailing: Icon(Icons.chevron_right,
+                      color: tokens.onSurfaceMuted),
+                  onTap: () {},
+                ),
+                SilkListTile(
+                  leading: Icon(Icons.notifications_outlined,
+                      color: context.tokens.onSurfaceMuted),
+                  title: Text('Notifications', style: tokens.bodyStyle),
+                  trailing: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Icon(Icons.chevron_right, color: tokens.onSurfaceMuted),
+                      const Positioned(
+                        right: 18,
+                        top: 0,
+                        child: SilkBadge.count(count: 3),
+                      ),
+                    ],
+                  ),
+                  onTap: () {},
+                ),
+                const _AppearanceTile(),
+                SilkListTile(
+                  leading: Icon(Icons.delete_outline, color: tokens.danger),
+                  title: Text(
+                    'Delete account',
+                    style: tokens.bodyStyle.copyWith(color: tokens.danger),
+                  ),
+                  showDivider: false,
+                  onTap: () {},
+                ),
+              ],
+            )),
+
+            // ── Bottom Sheet ───────────────────────────────────────────────
+            _Section(title: 'Bottom Sheet', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: SilkButton(
+                label: 'Open bottom sheet',
+                variant: SilkButtonVariant.secondary,
+                onPressed: () => unawaited(
+                  SilkBottomSheet.show(
+                    context: context,
+                    title: 'Example sheet',
+                    child: Padding(
+                      padding: EdgeInsets.all(tokens.spaceLg),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Bottom sheets slide up with a spring animation and can contain any content.',
+                            style: tokens.bodyStyle
+                                .copyWith(color: tokens.onSurfaceMuted),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: tokens.spaceLg),
+                          SilkButton(
+                            label: 'Got it',
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                          SizedBox(height: tokens.spaceMd),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            )),
+
+            // ── Context Menu ───────────────────────────────────────────────
+            _Section(title: 'Context Menu (long press)', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: SilkContextMenu(
+                items: [
+                  SilkContextMenuItem(
+                    label: 'Copy',
+                    icon: Icons.copy_outlined,
+                    onTap: () {},
+                  ),
+                  SilkContextMenuItem(
+                    label: 'Share',
+                    icon: Icons.share_outlined,
+                    onTap: () {},
+                  ),
+                  SilkContextMenuItem(
+                    label: 'Delete',
+                    icon: Icons.delete_outline,
+                    onTap: () {},
+                    isDestructive: true,
+                  ),
+                ],
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: tokens.surfaceMuted,
+                    borderRadius: BorderRadius.circular(tokens.radiusMd),
+                    border: Border.all(color: tokens.divider),
+                  ),
+                  padding: EdgeInsets.all(tokens.spaceMd),
+                  child: Row(
+                    children: [
+                      Icon(Icons.touch_app_outlined,
+                          color: tokens.onSurfaceMuted, size: 18),
+                      SizedBox(width: tokens.spaceSm),
+                      Text(
+                        'Long-press me for a context menu',
+                        style: tokens.bodyStyle
+                            .copyWith(color: tokens.onSurfaceMuted),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )),
+
+            // ── Reaction Burst ─────────────────────────────────────────────
+            _Section(
+              title: 'Reaction Burst',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tap any reaction — particles burst from the Overlay.',
+                      style: tokens.captionStyle
+                          .copyWith(color: tokens.onSurfaceMuted),
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: tokens.spaceMd,
+                        vertical: tokens.spaceSm,
+                      ),
+                      decoration: BoxDecoration(
+                        color: tokens.surfaceMuted,
+                        borderRadius:
+                            BorderRadius.circular(tokens.radiusPill),
+                        border: Border.all(color: tokens.divider),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const _ReactionChip(
+                            emoji: '❤️',
+                            count: 24,
+                            color: Color(0xFFE0245E),
+                          ),
+                          SizedBox(width: tokens.spaceXs),
+                          _ReactionChip(
+                            emoji: '👍',
+                            count: 142,
+                            color: tokens.accent,
+                          ),
+                          SizedBox(width: tokens.spaceXs),
+                          const _ReactionChip(
+                            emoji: '😂',
+                            count: 8,
+                            color: Color(0xFFF7B731),
+                          ),
+                          SizedBox(width: tokens.spaceXs),
+                          const _ReactionChip(
+                            emoji: '🔥',
+                            count: 3,
+                            color: Color(0xFFFF6348),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Search Bar ────────────────────────────────────────────────
+            _Section(
+              title: 'Search Bar',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkSearchBar(
+                  controller: _searchController,
+                  placeholder: 'Search anything…',
+                ),
+              ),
+            ),
+
+            // ── Switch ─────────────────────────────────────────────────────
+            _Section(
+              title: 'Switch',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        SilkSwitch(
+                          value: _switchOn,
+                          onChanged: (v) => setState(() => _switchOn = v),
+                        ),
+                        SizedBox(width: tokens.spaceMd),
+                        Text(
+                          _switchOn ? 'On' : 'Off',
+                          style: tokens.bodyStyle,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: tokens.spaceSm),
+                    Row(
+                      children: [
+                        const SilkSwitch(value: false, onChanged: null),
+                        SizedBox(width: tokens.spaceMd),
+                        Text(
+                          'Disabled',
+                          style: tokens.bodyStyle
+                              .copyWith(color: tokens.onSurfaceMuted),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Checkbox ───────────────────────────────────────────────────
+            _Section(
+              title: 'Checkbox',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SilkCheckbox(
+                      value: _checkboxA,
+                      label: 'Accept terms & conditions',
+                      onChanged: (v) => setState(() => _checkboxA = v),
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    SilkCheckbox(
+                      value: _checkboxB,
+                      label: 'Receive marketing emails',
+                      onChanged: (v) => setState(() => _checkboxB = v),
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    const SilkCheckbox(
+                      value: false,
+                      label: 'Disabled option',
+                      onChanged: null,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Segmented Control ──────────────────────────────────────────
+            _Section(
+              title: 'Segmented Control',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkSegmentedControl<String>(
+                  selected: _segment,
+                  onSelected: (v) => setState(() => _segment = v),
+                  segments: const [
+                    SilkSegment(value: 'day', label: 'Day'),
+                    SilkSegment(value: 'week', label: 'Week'),
+                    SilkSegment(value: 'month', label: 'Month'),
+                    SilkSegment(value: 'year', label: 'Year'),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Radio Group ────────────────────────────────────────────────
+            _Section(
+              title: 'Radio Group',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkRadioGroup<String>(
+                  selected: _radioValue,
+                  onSelected: (v) => setState(() => _radioValue = v),
+                  options: const [
+                    SilkRadioOption(
+                      value: 'free',
+                      label: 'Free',
+                      description: 'Up to 3 projects',
+                    ),
+                    SilkRadioOption(
+                      value: 'pro',
+                      label: 'Pro',
+                      description: r'$9/month · unlimited projects',
+                    ),
+                    SilkRadioOption(
+                      value: 'team',
+                      label: 'Team',
+                      description: r'$29/month · team collaboration',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Chips ──────────────────────────────────────────────────────
+            _Section(
+              title: 'Chips',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Wrap(
+                  spacing: tokens.spaceSm,
+                  runSpacing: tokens.spaceSm,
+                  children: [
+                    SilkChip(label: 'Default', onTap: () {}),
+                    SilkChip(label: 'Selected', selected: true, onTap: () {}),
+                    SilkChip(
+                      label: 'With icon',
+                      leadingIcon: Icons.tag,
+                      onTap: () {},
+                    ),
+                    SilkChip(
+                      label: 'Deletable',
+                      onDelete: () {},
+                      onTap: () {},
+                    ),
+                    const SilkChip(label: 'Disabled'),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Divider ────────────────────────────────────────────────────
+            _Section(
+              title: 'Divider',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    const SilkDivider(),
+                    SizedBox(height: tokens.spaceMd),
+                    const SilkDivider(label: 'or continue with'),
+                    SizedBox(height: tokens.spaceMd),
+                    const SilkDivider(label: 'Today'),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Progress Bar ───────────────────────────────────────────────
+            _Section(
+              title: 'Progress Bar',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    SilkProgressBar(
+                      value: _progressValue,
+                      label: 'Upload progress',
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    const SilkProgressBar(
+                      value: 0.7,
+                      variant: SilkProgressBarVariant.success,
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    const SilkProgressBar(
+                      value: 0.45,
+                      variant: SilkProgressBarVariant.danger,
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SilkProgressBar(value: _progressValue),
+                        ),
+                        SizedBox(width: tokens.spaceSm),
+                        SilkIconButton(
+                          icon: Icons.remove,
+                          size: SilkIconButtonSize.sm,
+                          onPressed: _progressValue > 0
+                              ? () => setState(
+                                    () => _progressValue =
+                                        (_progressValue - 0.1).clamp(0.0, 1.0),
+                                  )
+                              : null,
+                        ),
+                        SilkIconButton(
+                          icon: Icons.add,
+                          size: SilkIconButtonSize.sm,
+                          onPressed: _progressValue < 1
+                              ? () => setState(
+                                    () => _progressValue =
+                                        (_progressValue + 0.1).clamp(0.0, 1.0),
+                                  )
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Empty State ────────────────────────────────────────────────
+            _Section(
+              title: 'Empty State',
+              child: SilkEmptyState(
+                icon: Icons.inbox_outlined,
+                title: 'Nothing here yet',
+                body: "When you add items they'll appear here.",
+                actionLabel: 'Add your first item',
+                onAction: () {},
+              ),
+            ),
+
+            // ── Toast ──────────────────────────────────────────────────────
+            _Section(
+              title: 'Toast',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Wrap(
+                  spacing: tokens.spaceSm,
+                  runSpacing: tokens.spaceSm,
+                  children: [
+                    SilkButton(
+                      label: 'Success',
+                      variant: SilkButtonVariant.secondary,
+                      onPressed: () => SilkToast.show(
+                        context,
+                        'Changes saved successfully.',
+                        variant: SilkToastVariant.success,
+                      ),
+                    ),
+                    SilkButton(
+                      label: 'Error',
+                      variant: SilkButtonVariant.secondary,
+                      onPressed: () => SilkToast.show(
+                        context,
+                        'Something went wrong. Try again.',
+                        variant: SilkToastVariant.error,
+                      ),
+                    ),
+                    SilkButton(
+                      label: 'Warning',
+                      variant: SilkButtonVariant.secondary,
+                      onPressed: () => SilkToast.show(
+                        context,
+                        'Your session expires in 5 minutes.',
+                        variant: SilkToastVariant.warning,
+                      ),
+                    ),
+                    SilkButton(
+                      label: 'Info',
+                      variant: SilkButtonVariant.secondary,
+                      onPressed: () => SilkToast.show(
+                        context,
+                        'New version available. Restart to update.',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Skeleton ───────────────────────────────────────────────────
+            _Section(
+              title: 'Skeleton',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    const SilkSkeleton.listItem(),
+                    SizedBox(height: tokens.spaceMd),
+                    const SilkSkeleton.listItem(),
+                    SizedBox(height: tokens.spaceMd),
+                    const SilkSkeleton.text(lines: 4),
+                    SizedBox(height: tokens.spaceMd),
+                    const SilkSkeleton.card(),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Bottom Nav Bar ─────────────────────────────────────────────
+            _Section(
+              title: 'Bottom Nav Bar',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(tokens.radiusLg),
+                  child: SilkBottomNavBar(
+                    currentIndex: _navIndex,
+                    onTap: (i) => setState(() => _navIndex = i),
+                    items: const [
+                      SilkNavItem(icon: Icons.home_outlined, label: 'Home'),
+                      SilkNavItem(
+                        icon: Icons.explore_outlined,
+                        label: 'Explore',
+                      ),
+                      SilkNavItem(
+                        icon: Icons.notifications_outlined,
+                        label: 'Alerts',
+                      ),
+                      SilkNavItem(
+                        icon: Icons.person_outline,
+                        label: 'Profile',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // ── Shimmer ────────────────────────────────────────────────────
+            _Section(title: 'Shimmer / Loading', child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const SilkShimmer(width: 48, height: 48, borderRadius: 24),
+                      SizedBox(width: tokens.spaceMd),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SilkShimmer(
+                              width: double.infinity,
+                              height: 14,
+                              borderRadius: tokens.radiusSm,
+                            ),
+                            SizedBox(height: tokens.spaceXs),
+                            SilkShimmer(
+                              width: 140,
+                              height: 12,
+                              borderRadius: tokens.radiusSm,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: tokens.spaceMd),
+                  Row(
+                    children: [
+                      const SilkShimmer(width: 48, height: 48, borderRadius: 24),
+                      SizedBox(width: tokens.spaceMd),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SilkShimmer(
+                              width: double.infinity,
+                              height: 14,
+                              borderRadius: tokens.radiusSm,
+                            ),
+                            SizedBox(height: tokens.spaceXs),
+                            SilkShimmer(
+                              width: 100,
+                              height: 12,
+                              borderRadius: tokens.radiusSm,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: tokens.spaceMd),
+                  SilkShimmer(
+                    width: double.infinity,
+                    height: 120,
+                    borderRadius: tokens.radiusMd,
+                  ),
+                ],
+              ),
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Appearance tile ────────────────────────────────────────────────────────
+
+class _AppearanceTile extends ConsumerWidget {
+  const _AppearanceTile();
+
+  static const _modes = [
+    (ThemeMode.system, 'System', Icons.brightness_auto_outlined),
+    (ThemeMode.light, 'Light', Icons.light_mode_outlined),
+    (ThemeMode.dark, 'Dark', Icons.dark_mode_outlined),
+  ];
+
+  String _label(ThemeMode mode) =>
+      _modes.firstWhere((m) => m.$1 == mode).$2;
+
+  IconData _icon(ThemeMode mode) =>
+      _modes.firstWhere((m) => m.$1 == mode).$3;
+
+  Future<void> _showPicker(BuildContext context, ThemeMode current) async {
+    await SilkBottomSheet.show<void>(
+      context: context,
+      title: 'Appearance',
+      child: Consumer(
+        builder: (ctx, ref, _) {
+          final tokens = ctx.tokens;
+          return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Template ready.',
-                style: tokens.titleStyle,
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: tokens.spaceSm),
-              Text(
-                'Build your features on top of this foundation.',
-                style: tokens.bodyStyle.copyWith(
-                  color: tokens.onSurfaceMuted,
+              for (final (mode, label, icon) in _modes)
+                SilkListTile(
+                  leading: Icon(icon, color: tokens.onSurfaceMuted),
+                  title: Text(label, style: tokens.bodyStyle),
+                  trailing: current == mode
+                      ? Icon(Icons.check, color: tokens.accent)
+                      : null,
+                  showDivider: mode != ThemeMode.dark,
+                  onTap: () {
+                    ref
+                        .read(themeModeNotifierProvider.notifier)
+                        .setMode(mode);
+                    Navigator.of(ctx).pop();
+                  },
                 ),
-                textAlign: TextAlign.center,
+              const SizedBox(height: 8),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tokens = context.tokens;
+    final current = ref.watch(themeModeNotifierProvider).valueOrNull
+        ?? ThemeMode.system;
+
+    return SilkListTile(
+      leading: Icon(_icon(current), color: tokens.onSurfaceMuted),
+      title: Text('Appearance', style: tokens.bodyStyle),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            _label(current),
+            style: tokens.captionStyle.copyWith(color: tokens.onSurfaceMuted),
+          ),
+          const SizedBox(width: 4),
+          Icon(Icons.chevron_right, color: tokens.onSurfaceMuted),
+        ],
+      ),
+      onTap: () => _showPicker(context, current),
+    );
+  }
+}
+
+// ─── Reaction chip ──────────────────────────────────────────────────────────
+
+class _ReactionChip extends StatefulWidget {
+  const _ReactionChip({
+    required this.emoji,
+    required this.count,
+    required this.color,
+  });
+
+  final String emoji;
+  final int count;
+  final Color color;
+
+  @override
+  State<_ReactionChip> createState() => _ReactionChipState();
+}
+
+class _ReactionChipState extends State<_ReactionChip> {
+  int _count = 0;
+  bool _reacted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _count = widget.count;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    return SilkReactionBurst(
+      color: widget.color,
+      onTap: () => setState(() {
+        if (_reacted) {
+          _count--;
+        } else {
+          _count++;
+        }
+        _reacted = !_reacted;
+      }),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: EdgeInsets.symmetric(
+          horizontal: tokens.spaceSm,
+          vertical: 6,
+        ),
+        decoration: BoxDecoration(
+          color: _reacted
+              ? widget.color.withValues(alpha: 0.12)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(tokens.radiusPill),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(widget.emoji, style: const TextStyle(fontSize: 18)),
+            const SizedBox(width: 4),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 160),
+              transitionBuilder: (child, anim) => SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.5),
+                  end: Offset.zero,
+                ).animate(anim),
+                child: FadeTransition(opacity: anim, child: child),
               ),
-              SizedBox(height: tokens.spaceXxl),
-              SilkButton(
-                label: 'Sign out',
-                variant: SilkButtonVariant.ghost,
-                onPressed: () =>
-                    ref.read(authControllerProvider.notifier).signOut(),
+              child: Text(
+                '$_count',
+                key: ValueKey(_count),
+                style: tokens.captionStyle.copyWith(
+                  color: _reacted ? widget.color : tokens.onSurfaceMuted,
+                  fontWeight:
+                      _reacted ? FontWeight.w700 : FontWeight.normal,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Section extends StatelessWidget {
+  const _Section({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            tokens.spaceLg,
+            tokens.spaceLg,
+            tokens.spaceLg,
+            tokens.spaceMd,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(title, style: tokens.titleStyle),
               ),
             ],
           ),
         ),
-      ),
+        child,
+        SizedBox(height: tokens.spaceXs),
+        Divider(color: tokens.divider, height: 1),
+      ],
     );
   }
 }

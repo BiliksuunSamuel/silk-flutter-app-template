@@ -34,15 +34,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       setState(() => _error = 'Please enter your phone number.');
       return;
     }
-
     setState(() => _error = null);
-    final success = await ref
-        .read(authControllerProvider.notifier)
-        .requestOtp(phone);
-
-    if (success && mounted) {
-      unawaited(context.push(RoutePaths.otp, extra: phone));
-    }
+    // Template demo: skip real OTP request and navigate directly.
+    // Replace with the commented block below for production:
+    //   final success = await ref.read(authControllerProvider.notifier).requestOtp(phone);
+    //   if (success && mounted) unawaited(context.push(RoutePaths.otp, extra: phone));
+    if (mounted) unawaited(context.push(RoutePaths.otp, extra: phone));
   }
 
   @override

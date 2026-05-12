@@ -1,4 +1,3 @@
-import 'package:flutter/physics.dart';
 import 'package:flutter/widgets.dart';
 
 abstract final class MotionTokens {
@@ -11,9 +10,9 @@ abstract final class MotionTokens {
 
   // Curves — Material 3 emphasized set
   static const Curve standardCurve = Curves.easeOutCubic;
-  static const Curve emphasizedDecel = Cubic(0.05, 0.7, 0.1, 1.0);
-  static const Curve emphasizedAccel = Cubic(0.3, 0.0, 0.8, 0.15);
-  static const Curve sharp = Cubic(0.4, 0.0, 0.6, 1.0);
+  static const Curve emphasizedDecel = Cubic(0.05, 0.7, 0.1, 1);
+  static const Curve emphasizedAccel = Cubic(0.3, 0, 0.8, 0.15);
+  static const Curve sharp = Cubic(0.4, 0, 0.6, 1);
 
   // Springs for sheets / FAB
   static const SpringDescription bouncy =
