@@ -1,88 +1,414 @@
 # Silk — Flutter App Template
 
-A production-ready Flutter template targeting Telegram-grade UI smoothness. Every architectural decision is locked in so feature authors focus on product logic, not infrastructure.
+A production-ready Flutter template. Token-driven design system, physics-based interactions, responsive typography, and all the infrastructure a real app needs wired up from day one.
+
+---
 
 ## Quick start
 
+**Requirements:** Flutter 3.35.7 · Dart 3.9.2
+
 ```bash
-# Install dependencies
+git clone <repo-url> && cd silk
 flutter pub get
-
-# Generate code (freezed, riverpod, json_serializable)
 dart run build_runner build --delete-conflicting-outputs
-
-# Run app
 flutter run
-
-# Run widgetbook
-flutter run -t widgetbook/main.dart
-
-# Run tests
-flutter test
-
-# Static analysis (must be clean)
-flutter analyze
 ```
+
+Run with environment config:
+
+```bash
+flutter run \
+  --dart-define=ENV=development \
+  --dart-define=BASE_URL=https://your-api.com
+```
+
+---
 
 ## Non-negotiables
 
-1. **No literal `Duration(...)` or `Curves.*` in feature code.** Use `MotionTokens`.
-2. **No hardcoded colors, spacings, radii, or text styles.** Use `context.tokens`.
-3. **No direct `ElevatedButton`, `TextField`, `BottomSheet`, `ListTile` in features.** Use `Silk*` widgets.
-4. **No `FutureBuilder` or `Future + setState` for async UI.** Use Riverpod `AsyncValue`.
-5. **No `if (isDark) ... else ...` branches.** Dark mode is a second token set — same widget code.
-6. **No `print()` calls.** Use `AppLogger`.
-7. **No `MaterialApp.router` without `SilkScrollBehavior`.**
-8. **Every `Silk*` widget has a widgetbook use case.**
+These rules keep the codebase consistent across features and authors:
+
+1. **No raw `Duration(...)` or `Curves.*` in feature code.** Use `MotionTokens`.
+2. **No hardcoded colors, spacing, radii, or text styles.** Use `context.tokens`.
+3. **No `ElevatedButton`, `TextField`, `ListTile`, etc. in features.** Use `Silk*` widgets.
+4. **No `FutureBuilder` or `setState` for async UI.** Use Riverpod `AsyncValue`.
+5. **No `if (isDark) ... else ...` branches.** Dark mode is a second token set — same widget tree.
+6. **No `print()`.** Use `AppLogger`.
+7. **No literal font sizes, line heights, or letter spacing.** Use `.sp`, `.ls` and the token type styles.
+
+---
 
 ## Project structure
 
 ```
 lib/
-  main.dart                              Bootstrap: ProviderScope + runApp
-  app/
-    app.dart                             Root MaterialApp.router
-    bootstrap.dart                       Async init
-    scroll_behavior.dart                 Custom ScrollBehavior
-  core/
-    theme/                               AppTokens + light/dark instances + ThemeBuilder
-    motion/                              MotionTokens, SilkScrollPhysics, Haptics
-    network/                             Result<T,E>, ApiException, interceptors, dioProvider
-    error/                               AppFailure sealed type + FailureMapper
-    router/                              GoRouter + route paths + page transitions
-    storage/                             KeyValueStore abstraction (secure + prefs)
-    logging/                             AppLogger
-  shared/
-    widgets/                             Silk* widget layer
-    extensions/                          BuildContext + AsyncValue extensions
-  features/
-    auth/                                Auth feature (login + OTP + session)
-    home/                                Home stub
-widgetbook/                              Visual widget catalog
+├── main.dart
+├── app/                    # Wire-up only — no logic
+│   ├── app.dart            # MaterialApp.router, theme, l10n, SilkSizer refresh
+│   ├── bootstrap.dart      # Error handlers, crash reporter, SilkSizer seed
+│   └── scroll_behavior.dart
+│
+├── core/                   # App-wide infrastructure — no feature logic
+│   ├── analytics/          # AnalyticsService interface + stub
+│   ├── config/             # AppConfig (--dart-define env/flavors)
+│   ├── connectivity/       # Reactive network status + SilkOfflineBanner
+│   ├── crash/              # CrashReporter interface + stub
+│   ├── error/              # AppFailure + FailureMapper
+│   ├── extensions/         # SilkSizer, .sp / .ls / .lh / .sw / .sh
+│   ├── logging/            # AppLogger
+│   ├── media/              # MediaService (image + file picking)
+│   ├── motion/             # MotionTokens, Haptics, scroll physics
+│   ├── network/            # HttpClient, ApiException, Dio, interceptors
+│   ├── notifications/      # PushNotificationService interface + stub
+│   ├── permissions/        # PermissionService
+│   ├── router/             # go_router config, route paths, page transitions
+│   ├── storage/            # KeyValueStore → PrefsStore / SecureStore
+│   └── theme/              # AppTokens, AppTypography, light/dark tokens,
+│                           # ThemeBuilder, SilkIconSize, SilkFontSize
+│
+├── features/               # One folder per product feature
+│   └── <feature>/
+│       ├── data/           # API client, repository, models
+│       ├── domain/         # Pure models — no Flutter, no Dio
+│       └── presentation/
+│           ├── providers/  # Riverpod notifiers
+│           ├── screens/
+│           └── widgets/    # Feature-scoped widgets
+│
+├── shared/                 # Cross-feature, reusable
+│   ├── extensions/         # BuildContext + AsyncValue helpers
+│   ├── pagination/         # PaginatedState<T> + PaginatedNotifierMixin<T>
+│   ├── validators/         # Composable form validators
+│   └── widgets/            # All Silk components
+│
+└── l10n/                   # Generated ARB localizations
 ```
 
-## Adding a new feature
+**Dependency rules**
+
+- `features/` → `core/` and `shared/`, never another feature
+- `shared/` → `core/`, never `features/`
+- `core/` → nothing in `lib/` except other `core/` modules
+- Within a feature: `domain/` has no Flutter deps; `data/` depends on `domain/`; `presentation/` depends on both
+
+---
+
+## Design system
+
+### Tokens
+
+Every visual value — color, spacing, radius, shadow, typography — lives in `AppTokens`, a `ThemeExtension`. Access it via `context.tokens`.
+
+```dart
+Container(color: context.tokens.accent)
+SizedBox(height: context.tokens.spaceMd)      // 16
+Text('Title', style: context.tokens.titleStyle)
+```
+
+Light and dark values are defined in `light_tokens.dart` / `dark_tokens.dart`. To change a color or add a token: update `AppTokens` in `tokens.dart`, then update both token files.
+
+### Typography
+
+Ten-step Inter type scale. All sizes responsive via `SilkSizer`.
+
+| Token | Size | Weight | Use |
+|---|---|---|---|
+| `displayStyle` | 32 | 700 | Hero text |
+| `headlineStyle` | 24 | 600 | Page titles |
+| `titleStyle` | 20 | 600 | Section headings |
+| `titleSmStyle` | 17 | 600 | Nav titles, list items |
+| `bodyStyle` | 16 | 400 | Standard body |
+| `bodySmStyle` | 14 | 400 | Dense / secondary body |
+| `labelStyle` | 13 | 500 | Chips, badges, buttons |
+| `captionStyle` | 12 | 400 | Helper text, timestamps |
+| `overlineStyle` | 11 | 600 | Section dividers |
+| `monoStyle` | 14 | 400 mono | Code, OTP, numeric fields |
+
+To change the font, update the `GoogleFonts.*` call in `app_typography.dart`.
+
+### Responsive sizing
+
+`SilkSizer` scales values against a 390 dp design canvas (iPhone 14). It is seeded before the first frame in `bootstrap.dart` and refreshed on every `SilkApp` rebuild to handle rotation automatically.
+
+```dart
+// Typography (context-free — SilkSizer holds the current screen width)
+fontSize:      16.sp
+letterSpacing: (-0.3).ls     // letter spacing in logical pixels, scales with screen
+
+// Note: TextStyle.height is a ratio relative to fontSize — do NOT use .lh there,
+// it would create a ratio² effect. Use plain doubles: height: 1.5
+
+// Fractional layout (needs context for live MediaQuery values)
+0.5.sw(context)              // 50 % of screen width
+0.3.sh(context)              // 30 % of screen height
+0.8.safeHeight(context)      // 80 % minus status bar + home indicator
+0.6.availableHeight(context) // 80 % minus safe area and keyboard
+
+// System UI metadata
+context.statusBarHeight
+context.bottomBarHeight
+context.keyboardHeight
+context.isKeyboardVisible
+
+// Size constants
+Icon(Icons.star, size: SilkIconSize.md)   // 24 — xs 14 / sm 18 / md 24 / lg 32 / xl 48
+```
+
+---
+
+## Environments / flavors
+
+Configuration is injected at compile time via `--dart-define`. No `.env` files, no multiple entry points.
 
 ```bash
-dart run tool/new_feature.dart <feature_name>
+# Local (defaults: ENV=development, BASE_URL=https://httpbin.org)
+flutter run
+
+# Staging
+flutter run \
+  --dart-define=ENV=staging \
+  --dart-define=BASE_URL=https://staging-api.example.com
+
+# Production build
+flutter build apk \
+  --dart-define=ENV=production \
+  --dart-define=BASE_URL=https://api.example.com
 ```
 
-Creates the standard feature slice: `data/`, `domain/`, `presentation/providers/`, `presentation/screens/`, `presentation/widgets/`.
+Read values anywhere:
 
-See [docs/architecture.md](docs/architecture.md) for layer contracts and [docs/motion.md](docs/motion.md) for motion guidelines.
+```dart
+AppConfig.baseUrl         // String
+AppConfig.isDevelopment   // bool
+AppConfig.isProduction    // bool
+```
+
+**VS Code** — `.vscode/launch.json`:
+
+```json
+{
+  "configurations": [
+    {
+      "name": "Silk – dev",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--dart-define=ENV=development",
+        "--dart-define=BASE_URL=https://dev-api.example.com"
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## Networking
+
+All HTTP calls go through `HttpClient`, which wraps Dio and maps `DioException → ApiException` at the boundary. Repositories catch `ApiException` and convert it to `AppFailure` via `FailureMapper`.
+
+```
+HttpClient → ApiException → FailureMapper → AppFailure
+```
+
+```dart
+// In an API class
+final res = await _client.post<Map<String, dynamic>>(
+  HttpRequestDto(url: '/auth/login', data: body),
+);
+
+// In a repository
+try {
+  final res = await _api.login(request);
+  return Result.success(res);
+} on ApiException catch (e) {
+  return Result.failure(FailureMapper.map(e));
+}
+```
+
+`AuthInterceptor` attaches the session token automatically and handles `401 → silent refresh → retry`. A separate `_refreshDio` instance is used for the refresh call to avoid circular interception.
+
+---
+
+## Swapping stub services
+
+Four services ship as no-op stubs and are designed to be replaced. Override the provider in `ProviderScope` at startup.
+
+### Analytics
+
+Implement `AnalyticsService` and override `analyticsServiceProvider`:
+
+```dart
+// lib/main.dart
+await bootstrap(
+  () => ProviderScope(
+    overrides: [
+      analyticsServiceProvider.overrideWithValue(FirebaseAnalyticsService()),
+    ],
+    child: const SilkApp(),
+  ),
+);
+```
+
+### Crash reporting
+
+Implement `CrashReporter` and override `crashReporterProvider`. The error handlers in `bootstrap.dart` (`FlutterError.onError`, `PlatformDispatcher.instance.onError`) automatically call through to it — no changes needed there.
+
+### Push notifications
+
+Implement `PushNotificationService` and override `pushNotificationServiceProvider`. The interface covers `requestPermission()`, `getToken()`, `onMessage` stream, and `onNotificationTap` stream.
+
+### Connectivity
+
+No stub — `connectivityStreamProvider` is a live `Stream<bool>` via `connectivity_plus`. Drop `SilkOfflineBanner` above your scaffold body:
+
+```dart
+body: Column(
+  children: [
+    const SilkOfflineBanner(),
+    Expanded(child: yourContent),
+  ],
+)
+```
+
+---
+
+## Adding a feature
+
+1. Create `lib/features/<name>/` with `data/`, `domain/`, `presentation/`
+2. Define your domain model in `domain/` — plain Dart, no imports outside `dart:core`
+3. Add an API class in `data/` using `HttpClient`
+4. Add a repository in `data/` returning `Result<T, AppFailure>`
+5. Add a Riverpod notifier in `presentation/providers/`
+6. Build screens in `presentation/screens/`
+7. Register routes in `core/router/app_router.dart` and `route_paths.dart`
+
+---
+
+## Pagination
+
+Mix `PaginatedNotifierMixin<T>` into any Riverpod `Notifier` to get first-page loading, load-more, and refresh:
+
+```dart
+@riverpod
+class PostsNotifier extends _$PostsNotifier
+    with PaginatedNotifierMixin<Post> {
+  @override
+  PaginatedState<Post> build() => loadFirstPage();
+
+  @override
+  Future<(List<Post>, bool)> fetchPage(int page) async {
+    final posts = await ref.read(postRepoProvider).getPosts(page: page);
+    return (posts, posts.length == 20);
+  }
+}
+```
+
+---
+
+## Form validation
+
+Validators are composable functions of type `String? Function(String? value)`:
+
+```dart
+SilkTextField(
+  hint: 'Email',
+  validator: Validators.compose([
+    Validators.required(),
+    Validators.email(),
+  ]),
+)
+```
+
+Built-in validators: `required`, `email`, `phone`, `minLength`, `maxLength`, `pattern`, `match`, `compose`.
+
+---
+
+## Localization
+
+Strings live in `lib/l10n/app_en.arb`. After editing:
+
+```bash
+flutter gen-l10n
+```
+
+```dart
+Text(AppLocalizations.of(context).signIn)
+```
+
+To add a language, create `lib/l10n/app_<locale>.arb` and list the locale in `l10n.yaml`.
+
+---
+
+## Codegen
+
+Any change to a `@riverpod` provider or `@freezed` class needs regeneration:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+
+# Or in watch mode during active development
+dart run build_runner watch --delete-conflicting-outputs
+```
+
+---
 
 ## Tech stack
 
-| Concern        | Package                                         |
-| -------------- | ----------------------------------------------- |
-| State          | `flutter_riverpod` + `riverpod_generator`       |
-| Navigation     | `go_router` + custom `CustomTransitionPage`s    |
-| HTTP           | `dio` + typed client classes                    |
-| Serialization  | `freezed` + `json_serializable`                 |
-| Storage        | `flutter_secure_storage` + `shared_preferences` |
-| Animation      | `flutter_animate` + `animations`                |
-| Images         | `cached_network_image`                          |
-| Haptics        | `HapticFeedback` wrapped in `Haptics`           |
-| Logging        | `logger` wrapped in `AppLogger`                 |
-| Lints          | `very_good_analysis`                            |
-| Widget catalog | `widgetbook`                                    |
+| Concern | Package |
+|---|---|
+| State | `flutter_riverpod` + `riverpod_generator` |
+| Navigation | `go_router` |
+| HTTP | `dio` + `HttpClient` wrapper |
+| Serialization | `freezed` + `json_serializable` |
+| Storage | `shared_preferences` + `flutter_secure_storage` |
+| Typography | `google_fonts` (Inter + JetBrains Mono) |
+| Animation | `flutter_animate` + `animations` |
+| Images | `cached_network_image` + `flutter_svg` |
+| Connectivity | `connectivity_plus` |
+| Permissions | `permission_handler` |
+| Media | `image_picker` + `file_picker` |
+| Localization | `flutter_localizations` + `intl` |
+| Linting | `very_good_analysis` |
+| Codegen | `build_runner` |
+
+---
+
+## Components
+
+| Widget | Description |
+|---|---|
+| `SilkButton` | Primary / secondary / ghost / danger variants |
+| `SilkIconButton` | Icon button with reaction burst |
+| `SilkSvgButton` | SVG icon button |
+| `SilkTextField` | Animated border, inline validator, prefix/suffix |
+| `SilkSearchBar` | Compact, slim search input |
+| `SilkAppBar` | Token-styled app bar |
+| `SilkBackButton` | Themed back button |
+| `SilkBottomNavBar` | Nav bar with particle burst on tap |
+| `SilkBottomSheet` | Modal bottom sheet |
+| `SilkListTile` | Token-styled list tile |
+| `SilkAvatar` | Cached image avatar with initials fallback |
+| `SilkBadge` | Notification / count badge |
+| `SilkChip` | Selectable / deletable chip |
+| `SilkSwitch` | Spring-animated toggle with thumb stretch |
+| `SilkCheckbox` | Animated checkbox with reaction burst |
+| `SilkRadioGroup` | Radio group with reaction burst on dot |
+| `SilkSegmentedControl` | Generic segmented control |
+| `SilkDropdown` | Dropdown selector |
+| `SilkMultiValueSelectInput` | Multi-value select |
+| `SilkContextMenu` | Long-press context menu with squish animation |
+| `SilkProgressBar` | Animated fill bar — accent / success / danger |
+| `SilkDivider` | Plain or labeled divider |
+| `SilkEmptyState` | Icon + title + body + optional CTA |
+| `SilkToast` | Transient notification with spring entry |
+| `SilkShimmer` | Shimmer loading effect |
+| `SilkSkeleton` | Skeleton screens — `listItem`, `card`, `text` |
+| `SilkCalendar` | Calendar |
+| `SilkDatePicker` | Date picker |
+| `SilkTimePicker` | Time picker |
+| `SilkDateTimePicker` | Combined date + time picker |
+| `SilkPullToRefresh` | Pull-to-refresh wrapper |
+| `SilkGestureBack` | Swipe-back gesture handler |
+| `SilkReactionBurst` | Particle burst — wrapper and imperative `trigger()` |
