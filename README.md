@@ -9,11 +9,38 @@ A production-ready Flutter template. Token-driven design system, physics-based i
 **Requirements:** Flutter 3.35.7 · Dart 3.9.2
 
 ```bash
-git clone <repo-url> && cd silk
+git clone <repo-url> my_app && cd my_app
+
+# 1. Rename the template (package name, bundle ID, display name)
+dart run tool/rename.dart \
+  --name=my_app \
+  --org=com.example \
+  --display="My App"
+
+# 2. Install dependencies and regenerate code
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
-flutter run
+flutter gen-l10n
+
+# 3. Run
+flutter run --dart-define=BASE_URL=https://your-api.com
 ```
+
+### What the rename script changes
+
+| Location | What changes |
+|---|---|
+| All `.dart` files | `package:silk/` → `package:my_app/` |
+| `pubspec.yaml` | `name: silk` → `name: my_app` |
+| `android/app/build.gradle.kts` | namespace + applicationId |
+| `android/.../AndroidManifest.xml` | package attribute |
+| `android/.../MainActivity.kt` | package declaration + moved to new directory |
+| `ios/Runner.xcodeproj/project.pbxproj` | `PRODUCT_BUNDLE_IDENTIFIER` |
+| `ios/Runner/Info.plist` | `CFBundleDisplayName`, `CFBundleName` |
+| `lib/app/app.dart` | `MaterialApp` title |
+| `lib/l10n/app_en.arb` | `appName` string |
+
+**What the script does NOT change:** `Silk*` widget names and file names — they belong to the design system, not the app. You can rename them later if you want, but it is not required.
 
 Run with environment config:
 
