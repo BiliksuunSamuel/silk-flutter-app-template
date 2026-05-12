@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:silk/app/scroll_behavior.dart';
+import 'package:silk/core/extensions/dimension_extensions.dart';
 import 'package:silk/core/router/app_router.dart';
 import 'package:silk/core/theme/dark_tokens.dart';
 import 'package:silk/core/theme/light_tokens.dart';
 import 'package:silk/core/theme/theme_builder.dart';
 import 'package:silk/core/theme/theme_mode_provider.dart';
+import 'package:silk/l10n/app_localizations.dart';
 
 class SilkApp extends ConsumerWidget {
   const SilkApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Refresh scale factor before evaluating tokens — handles rotation and
+    // multi-window scenarios where the screen width changes.
+    SilkSizer.screenWidth = MediaQuery.sizeOf(context).width;
+
     final router = ref.watch(appRouterProvider);
     final themeMode = ref
         .watch(themeModeNotifierProvider)
@@ -25,6 +32,13 @@ class SilkApp extends ConsumerWidget {
       themeMode: themeMode,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
     );
   }
 }

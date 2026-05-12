@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:silk/core/motion/motion_tokens.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
+import 'package:silk/shared/widgets/silk_reaction_burst.dart';
 
 class SilkNavItem {
   const SilkNavItem({required this.icon, required this.label});
@@ -37,43 +38,53 @@ class SilkBottomNavBar extends StatelessWidget {
             children: List.generate(items.length, (i) {
               final item = items[i];
               final selected = i == currentIndex;
+
               return Expanded(
-                child: GestureDetector(
+                child: SilkReactionBurst(
                   onTap: () => onTap(i),
-                  behavior: HitTestBehavior.opaque,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AnimatedContainer(
-                        duration: MotionTokens.fast,
-                        curve: MotionTokens.emphasizedDecel,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: tokens.spaceMd,
-                          vertical: tokens.spaceXs,
+                  color: tokens.accent,
+                  particleCount: 8,
+                  spreadRadius: 32,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedContainer(
+                          duration: MotionTokens.fast,
+                          curve: MotionTokens.emphasizedDecel,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: tokens.spaceMd,
+                            vertical: tokens.spaceXs,
+                          ),
+                          decoration: BoxDecoration(
+                            color: selected
+                                ? tokens.accent.withValues(alpha: 0.1)
+                                : Colors.transparent,
+                            borderRadius:
+                                BorderRadius.circular(tokens.radiusPill),
+                          ),
+                          child: Icon(
+                            item.icon,
+                            size: 22,
+                            color:
+                                selected ? tokens.accent : tokens.onSurfaceMuted,
+                          ),
                         ),
-                        decoration: BoxDecoration(
-                          color: selected
-                              ? tokens.accent.withValues(alpha: 0.1)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(tokens.radiusPill),
+                        SizedBox(height: tokens.spaceXs),
+                        AnimatedDefaultTextStyle(
+                          style: tokens.captionStyle.copyWith(
+                            color: selected
+                                ? tokens.accent
+                                : tokens.onSurfaceMuted,
+                            fontWeight:
+                                selected ? FontWeight.w600 : FontWeight.w400,
+                          ),
+                          duration: MotionTokens.fast,
+                          child: Text(item.label),
                         ),
-                        child: Icon(
-                          item.icon,
-                          size: 22,
-                          color: selected ? tokens.accent : tokens.onSurfaceMuted,
-                        ),
-                      ),
-                      SizedBox(height: tokens.spaceXs),
-                      AnimatedDefaultTextStyle(
-                        style: tokens.captionStyle.copyWith(
-                          color: selected ? tokens.accent : tokens.onSurfaceMuted,
-                          fontWeight:
-                              selected ? FontWeight.w600 : FontWeight.w400,
-                        ),
-                        duration: MotionTokens.fast,
-                        child: Text(item.label),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );

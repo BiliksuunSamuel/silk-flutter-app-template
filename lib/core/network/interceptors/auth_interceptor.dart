@@ -14,9 +14,12 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final session = _ref.read(sessionNotifierProvider).valueOrNull;
-    if (session != null) {
-      options.headers['Authorization'] = 'Bearer ${session.accessToken}';
+    // Respect a per-request token set via HttpRequestDto.token.
+    if (!options.headers.containsKey('Authorization')) {
+      final session = _ref.read(sessionNotifierProvider).valueOrNull;
+      if (session != null) {
+        options.headers['Authorization'] = 'Bearer ${session.accessToken}';
+      }
     }
     handler.next(options);
   }

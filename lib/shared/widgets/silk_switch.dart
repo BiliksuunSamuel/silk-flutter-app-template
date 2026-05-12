@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:silk/core/motion/haptics.dart';
@@ -22,20 +24,22 @@ class _SilkSwitchState extends State<SilkSwitch>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
 
-  static const _trackW = 52.0;
+  static const _trackW = 56.0;
   static const _trackH = 30.0;
   static const _thumbD = 24.0;
   static const _thumbPad = 3.0;
-  static const _travel = _trackW - _thumbD - _thumbPad * 2;
+  static const _maxStretch = 10.0;
+
+  // Thumb center x-coordinates at each extreme.
+  static const _centerLeft = _thumbPad + _thumbD / 2;
+  static const _centerRight = _trackW - _thumbPad - _thumbD / 2;
+  static const _centerTravel = _centerRight - _centerLeft;
 
   @override
   void initState() {
     super.initState();
-    // Allow spring overshoot beyond 1.0
     _ctrl = AnimationController(
       vsync: this,
-      lowerBound: 0,
-      upperBound: 1.5,
       value: widget.value ? 1.0 : 0.0,
     );
   }
@@ -51,8 +55,8 @@ class _SilkSwitchState extends State<SilkSwitch>
   void _animateTo(double target) {
     final spring = SpringDescription.withDampingRatio(
       mass: 1,
-      stiffness: 600,
-      ratio: 0.72,
+      stiffness: 500,
+      ratio: 0.68,
     );
     _ctrl.animateWith(SpringSimulation(spring, _ctrl.value, target, 0));
   }
@@ -82,18 +86,27 @@ class _SilkSwitchState extends State<SilkSwitch>
         child: AnimatedBuilder(
           animation: _ctrl,
           builder: (_, __) {
+            // Clamp position to track bounds; spring overshoot is absorbed.
             final t = _ctrl.value.clamp(0.0, 1.0);
+
+            // Thumb stretches into a pill at mid-travel, snaps back to circle.
+            final stretch = _maxStretch * math.sin(math.pi * t);
+            final thumbW = _thumbD + stretch;
+
+            final centerX = _centerLeft + _centerTravel * t;
+            final thumbLeft = centerX - thumbW / 2;
+
             final trackColor = Color.lerp(
-              tokens.onSurface.withValues(alpha: 0.12),
+              tokens.onSurface.withValues(alpha: 0.13),
               tokens.accent,
               t,
             )!;
-            final thumbX = _thumbPad + _travel * t;
 
             return SizedBox(
               width: _trackW,
               height: _trackH,
               child: Stack(
+                clipBehavior: Clip.antiAlias,
                 children: [
                   Positioned.fill(
                     child: DecoratedBox(
@@ -104,18 +117,18 @@ class _SilkSwitchState extends State<SilkSwitch>
                     ),
                   ),
                   Positioned(
-                    left: thumbX,
+                    left: thumbLeft,
                     top: _thumbPad,
                     child: Container(
-                      width: _thumbD,
+                      width: thumbW,
                       height: _thumbD,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(_thumbD / 2),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 6,
+                            color: Colors.black.withValues(alpha: 0.22),
+                            blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
                           BoxShadow(

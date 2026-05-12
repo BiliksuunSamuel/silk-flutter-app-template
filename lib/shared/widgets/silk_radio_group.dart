@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:silk/core/motion/motion_tokens.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
+import 'package:silk/shared/widgets/silk_reaction_burst.dart';
 
 class SilkRadioOption<T> {
   const SilkRadioOption({
@@ -43,7 +44,7 @@ class SilkRadioGroup<T> extends StatelessWidget {
   }
 }
 
-class _RadioTile<T> extends StatelessWidget {
+class _RadioTile<T> extends StatefulWidget {
   const _RadioTile({
     required this.option,
     required this.isSelected,
@@ -55,60 +56,90 @@ class _RadioTile<T> extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
+  State<_RadioTile<T>> createState() => _RadioTileState<T>();
+}
+
+class _RadioTileState<T> extends State<_RadioTile<T>> {
+  final _dotKey = GlobalKey();
+
+  void _handleTap() {
+    final dotCtx = _dotKey.currentContext;
+    if (dotCtx != null) {
+      SilkReactionBurst.trigger(
+        context: dotCtx,
+        color: context.tokens.accent,
+        particleCount: 6,
+        spreadRadius: 24,
+      );
+    }
+    widget.onTap();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: _handleTap,
       behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: tokens.spaceSm),
-        child: Row(
-          children: [
-            AnimatedContainer(
-              duration: MotionTokens.fast,
-              curve: MotionTokens.standardCurve,
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isSelected ? tokens.accent : Colors.transparent,
-                border: Border.all(
-                  color: isSelected ? tokens.accent : tokens.onSurfaceMuted,
-                  width: 1.5,
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: tokens.spaceSm),
+          child: Row(
+            children: [
+              AnimatedContainer(
+                key: _dotKey,
+                duration: MotionTokens.fast,
+                curve: MotionTokens.standardCurve,
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: widget.isSelected ? tokens.accent : Colors.transparent,
+                  border: Border.all(
+                    color: widget.isSelected
+                        ? tokens.accent
+                        : tokens.onSurfaceMuted,
+                    width: 1.5,
+                  ),
+                ),
+                child: widget.isSelected
+                    ? Center(
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      )
+                    : null,
+              ),
+              SizedBox(width: tokens.spaceMd),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.option.label,
+                      style: tokens.bodyStyle.copyWith(
+                        fontWeight: widget.isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                      ),
+                    ),
+                    if (widget.option.description != null)
+                      Text(
+                        widget.option.description!,
+                        style: tokens.captionStyle,
+                      ),
+                  ],
                 ),
               ),
-              child: isSelected
-                  ? Center(
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    )
-                  : null,
-            ),
-            SizedBox(width: tokens.spaceMd),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    option.label,
-                    style: tokens.bodyStyle.copyWith(
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.w400,
-                    ),
-                  ),
-                  if (option.description != null)
-                    Text(option.description!, style: tokens.captionStyle),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

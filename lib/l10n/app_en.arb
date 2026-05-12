@@ -1,0 +1,100 @@
+{
+  "@@locale": "en",
+
+  "appName": "Silk",
+  "@appName": { "description": "The name of the application." },
+
+  "ok": "OK",
+  "@ok": { "description": "Generic confirmation label." },
+
+  "cancel": "Cancel",
+  "@cancel": { "description": "Generic cancel label." },
+
+  "retry": "Retry",
+  "@retry": { "description": "Retry an action after a failure." },
+
+  "save": "Save",
+  "@save": { "description": "Save an item." },
+
+  "delete": "Delete",
+  "@delete": { "description": "Delete an item." },
+
+  "edit": "Edit",
+  "@edit": { "description": "Edit an item." },
+
+  "confirm": "Confirm",
+  "@confirm": { "description": "Confirm an action." },
+
+  "back": "Back",
+  "@back": { "description": "Go back to the previous screen." },
+
+  "done": "Done",
+  "@done": { "description": "Finish an action." },
+
+  "search": "Search",
+  "@search": { "description": "Search hint / label." },
+
+  "loading": "Loading…",
+  "@loading": { "description": "Generic loading state text." },
+
+  "somethingWentWrong": "Something went wrong",
+  "@somethingWentWrong": { "description": "Generic error message." },
+
+  "noInternetConnection": "No internet connection",
+  "@noInternetConnection": { "description": "Shown in the offline banner." },
+
+  "noResultsFound": "No results found",
+  "@noResultsFound": { "description": "Empty state for lists with active search." },
+
+  "nothingHereYet": "Nothing here yet",
+  "@nothingHereYet": { "description": "Default empty state message." },
+
+  "welcomeBack": "Welcome back",
+  "@welcomeBack": { "description": "Greeting on the home / dashboard screen." },
+
+  "signIn": "Sign in",
+  "@signIn": { "description": "Sign-in action label." },
+
+  "signOut": "Sign out",
+  "@signOut": { "description": "Sign-out action label." },
+
+  "phoneNumber": "Phone number",
+  "@phoneNumber": { "description": "Phone number field label." },
+
+  "enterOtp": "Enter OTP",
+  "@enterOtp": { "description": "OTP input screen title / label." },
+
+  "otpSentTo": "OTP sent to {phone}",
+  "@otpSentTo": {
+    "description": "Subtitle shown after an OTP is dispatched.",
+    "placeholders": {
+      "phone": { "type": "String" }
+    }
+  },
+
+  "resendOtp": "Resend OTP",
+  "@resendOtp": { "description": "Re-send OTP action." },
+
+  "fieldRequired": "This field is required",
+  "@fieldRequired": { "description": "Validation error when a required field is empty." },
+
+  "invalidEmail": "Enter a valid email address",
+  "@invalidEmail": { "description": "Validation error for malformed email." },
+
+  "invalidPhone": "Enter a valid phone number",
+  "@invalidPhone": { "description": "Validation error for malformed phone number." },
+
+  "passwordTooShort": "Password must be at least {min} characters",
+  "@passwordTooShort": {
+    "description": "Validation error for short passwords.",
+    "placeholders": {
+      "min": { "type": "int" }
+    }
+  },
+
+  "permissionDenied": "Permission denied",
+  "@permissionDenied": { "description": "Shown when an OS permission is not granted." },
+
+  "openSettings": "Open settings",
+  "@openSettings": { "description": "CTA to open OS app settings." }
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:silk/core/motion/motion_tokens.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
+import 'package:silk/shared/validators/validators.dart';
 
 class SilkTextField extends StatefulWidget {
   const SilkTextField({
@@ -11,6 +12,7 @@ class SilkTextField extends StatefulWidget {
     this.keyboardType,
     this.textInputAction,
     this.errorText,
+    this.validator,
     this.prefixIcon,
     this.suffixIcon,
     this.obscureText = false,
@@ -26,7 +28,13 @@ class SilkTextField extends StatefulWidget {
   final ValueChanged<String>? onSubmitted;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+
+  /// Static error message. Takes priority over [validator].
   final String? errorText;
+
+  /// Inline validator — runs on every change when provided. The first
+  /// non-null return value is shown as the error message.
+  final Validator? validator;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final bool obscureText;
@@ -41,6 +49,7 @@ class SilkTextField extends StatefulWidget {
 class _SilkTextFieldState extends State<SilkTextField> {
   late final FocusNode _focus;
   bool _hasFocus = false;
+  String? _validatorError;
 
   @override
   void initState() {
@@ -50,6 +59,13 @@ class _SilkTextFieldState extends State<SilkTextField> {
 
   void _onFocusChange() {
     setState(() => _hasFocus = _focus.hasFocus);
+  }
+
+  void _handleChanged(String value) {
+    if (widget.validator != null) {
+      setState(() => _validatorError = widget.validator!(value));
+    }
+    widget.onChanged?.call(value);
   }
 
   @override
@@ -63,7 +79,8 @@ class _SilkTextFieldState extends State<SilkTextField> {
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
-    final hasError = widget.errorText != null;
+    final displayError = widget.errorText ?? _validatorError;
+    final hasError = displayError != null;
 
     final borderColor = hasError
         ? tokens.danger
@@ -89,7 +106,7 @@ class _SilkTextFieldState extends State<SilkTextField> {
           child: TextField(
             controller: widget.controller,
             focusNode: _focus,
-            onChanged: widget.onChanged,
+            onChanged: _handleChanged,
             onSubmitted: widget.onSubmitted,
             keyboardType: widget.keyboardType,
             textInputAction: widget.textInputAction,
@@ -126,7 +143,7 @@ class _SilkTextFieldState extends State<SilkTextField> {
         if (hasError) ...[
           SizedBox(height: tokens.spaceXs),
           Text(
-            widget.errorText!,
+            displayError,
             style: tokens.captionStyle.copyWith(color: tokens.danger),
           ),
         ],

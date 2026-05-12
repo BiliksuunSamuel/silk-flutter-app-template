@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'api_exception.freezed.dart';
 
 @freezed
-sealed class ApiException with _$ApiException {
+sealed class ApiException with _$ApiException implements Exception {
   const factory ApiException.network(String message) = NetworkException;
   const factory ApiException.unauthorized() = UnauthorizedException;
   const factory ApiException.forbidden() = ForbiddenException;

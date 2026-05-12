@@ -1,8 +1,7 @@
-import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:silk/core/error/app_failure.dart';
 import 'package:silk/core/error/failure_mapper.dart';
-import 'package:silk/core/network/api_exception_mapper.dart';
+import 'package:silk/core/network/api_exception.dart';
 import 'package:silk/core/network/result.dart';
 import 'package:silk/features/auth/data/auth_api.dart';
 import 'package:silk/features/auth/data/models/login_request.dart';
@@ -23,8 +22,8 @@ class AuthRepository {
     try {
       await _api.login(LoginRequest(phone: phone));
       return const Result.success(true);
-    } on DioException catch (e) {
-      return Result.failure(FailureMapper.map(DioExceptionMapper.map(e)));
+    } on ApiException catch (e) {
+      return Result.failure(FailureMapper.map(e));
     }
   }
 
@@ -41,8 +40,8 @@ class AuthRepository {
           refreshToken: response.refreshToken,
         ),
       );
-    } on DioException catch (e) {
-      return Result.failure(FailureMapper.map(DioExceptionMapper.map(e)));
+    } on ApiException catch (e) {
+      return Result.failure(FailureMapper.map(e));
     }
   }
 }
