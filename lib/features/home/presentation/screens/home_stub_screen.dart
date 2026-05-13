@@ -5,47 +5,65 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
 import 'package:silk/core/theme/theme_mode_provider.dart';
 import 'package:silk/features/auth/presentation/providers/session_provider.dart';
+import 'package:silk/shared/widgets/silk_action_sheet.dart';
 import 'package:silk/shared/widgets/silk_alert.dart';
 import 'package:silk/shared/widgets/silk_amount_field.dart';
+import 'package:silk/shared/widgets/silk_animated_counter.dart';
 import 'package:silk/shared/widgets/silk_app_bar.dart';
 import 'package:silk/shared/widgets/silk_avatar.dart';
 import 'package:silk/shared/widgets/silk_badge.dart';
+import 'package:silk/shared/widgets/silk_banner.dart';
 import 'package:silk/shared/widgets/silk_bottom_nav_bar.dart';
 import 'package:silk/shared/widgets/silk_bottom_sheet.dart';
 import 'package:silk/shared/widgets/silk_button.dart';
 import 'package:silk/shared/widgets/silk_calendar.dart';
 import 'package:silk/shared/widgets/silk_card.dart';
+import 'package:silk/shared/widgets/silk_carousel.dart';
 import 'package:silk/shared/widgets/silk_checkbox.dart';
 import 'package:silk/shared/widgets/silk_chip.dart';
 import 'package:silk/shared/widgets/silk_context_menu.dart';
+import 'package:silk/shared/widgets/silk_countdown_timer.dart';
 import 'package:silk/shared/widgets/silk_date_picker.dart';
+import 'package:silk/shared/widgets/silk_date_range_picker.dart';
 import 'package:silk/shared/widgets/silk_date_time_picker.dart';
+import 'package:silk/shared/widgets/silk_dialog.dart';
 import 'package:silk/shared/widgets/silk_divider.dart';
+import 'package:silk/shared/widgets/silk_document_picker.dart';
 import 'package:silk/shared/widgets/silk_dropdown.dart';
 import 'package:silk/shared/widgets/silk_empty_state.dart';
 import 'package:silk/shared/widgets/silk_expandable.dart';
 import 'package:silk/shared/widgets/silk_expandable_text.dart';
+import 'package:silk/shared/widgets/silk_fab.dart';
 import 'package:silk/shared/widgets/silk_icon_button.dart';
+import 'package:silk/shared/widgets/silk_infinite_scroll.dart';
+import 'package:silk/shared/widgets/silk_keypad.dart';
 import 'package:silk/shared/widgets/silk_list_tile.dart';
 import 'package:silk/shared/widgets/silk_loading_overlay.dart';
 import 'package:silk/shared/widgets/silk_multi_value_select_input.dart';
+import 'package:silk/shared/widgets/silk_numeric_stepper.dart';
 import 'package:silk/shared/widgets/silk_otp_field.dart';
 import 'package:silk/shared/widgets/silk_phone_input.dart';
+import 'package:silk/shared/widgets/silk_pin_dots.dart';
 import 'package:silk/shared/widgets/silk_progress_bar.dart';
+import 'package:silk/shared/widgets/silk_progress_ring.dart';
 import 'package:silk/shared/widgets/silk_pull_to_refresh.dart';
 import 'package:silk/shared/widgets/silk_radio_group.dart';
+import 'package:silk/shared/widgets/silk_rating.dart';
 import 'package:silk/shared/widgets/silk_reaction_burst.dart';
 import 'package:silk/shared/widgets/silk_search_bar.dart';
 import 'package:silk/shared/widgets/silk_segmented_control.dart';
 import 'package:silk/shared/widgets/silk_shimmer.dart';
 import 'package:silk/shared/widgets/silk_skeleton.dart';
 import 'package:silk/shared/widgets/silk_slider.dart';
+import 'package:silk/shared/widgets/silk_sort_filter_bar.dart';
 import 'package:silk/shared/widgets/silk_stepper.dart';
 import 'package:silk/shared/widgets/silk_swipe_action.dart';
 import 'package:silk/shared/widgets/silk_switch.dart';
 import 'package:silk/shared/widgets/silk_tab_bar.dart';
+import 'package:silk/shared/widgets/silk_tag.dart';
 import 'package:silk/shared/widgets/silk_text_field.dart';
 import 'package:silk/shared/widgets/silk_time_picker.dart';
+import 'package:silk/shared/widgets/silk_timeline.dart';
 import 'package:silk/shared/widgets/silk_toast.dart';
 
 class HomeStubScreen extends ConsumerStatefulWidget {
@@ -78,6 +96,22 @@ class _HomeStubScreenState extends ConsumerState<HomeStubScreen> {
   bool _overlayVisible = false;
   String? _otpError;
   final _searchController = TextEditingController();
+  int _countdownKey = 0;
+  int _numericStepperValue = 1;
+  double _counterValue = 84320.50;
+  double _ringValue = 0.72;
+  String _keypadInput = '';
+  SilkDocumentStatus _docStatus = SilkDocumentStatus.empty;
+  String? _docName;
+  SilkDateRange? _dateRange;
+  final _infiniteItems = List<int>.generate(8, (i) => i + 1);
+  bool _infiniteLoading = false;
+  bool _infiniteHasMore = true;
+  double _rating = 3.5;
+  String? _sortFilter;
+  bool _sortActive = false;
+  int _pinFilled = 0;
+  bool _pinError = false;
 
   static final _countries = [
     const SilkSelectItem(value: 'ng', label: 'Nigeria'),
@@ -97,6 +131,20 @@ class _HomeStubScreenState extends ConsumerState<HomeStubScreen> {
 
   Future<void> _handleRefresh() async {
     await Future<void>.delayed(const Duration(milliseconds: 800));
+  }
+
+  Future<void> _loadMoreItems() async {
+    if (_infiniteLoading || !_infiniteHasMore) return;
+    setState(() => _infiniteLoading = true);
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+    if (!mounted) return;
+    setState(() {
+      _infiniteItems.addAll(
+        List.generate(4, (i) => _infiniteItems.length + i + 1),
+      );
+      _infiniteLoading = false;
+      if (_infiniteItems.length >= 20) _infiniteHasMore = false;
+    });
   }
 
   @override
@@ -527,6 +575,733 @@ class _HomeStubScreenState extends ConsumerState<HomeStubScreen> {
                       label: _overlayVisible ? 'Hide overlay' : 'Show overlay',
                       variant: SilkButtonVariant.secondary,
                       onPressed: () => setState(() => _overlayVisible = !_overlayVisible),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Animated Counter ───────────────────────────────────────────
+            _Section(
+              title: 'Animated Counter',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Portfolio value',
+                      style: tokens.captionStyle
+                          .copyWith(color: tokens.onSurfaceMuted),
+                    ),
+                    SizedBox(height: tokens.spaceXs),
+                    SilkAnimatedCounter(
+                      value: _counterValue,
+                      prefix: '₵ ',
+                      formatter: (v) => v.toStringAsFixed(2).replaceAllMapped(
+                            RegExp(r'(\d)(?=(\d{3})+\.)'),
+                            (m) => '${m[1]},',
+                          ),
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    Row(
+                      children: [
+                        SilkButton(
+                          label: '− 1,000',
+                          variant: SilkButtonVariant.secondary,
+                          onPressed: () => setState(
+                            () => _counterValue -= 1000,
+                          ),
+                        ),
+                        SizedBox(width: tokens.spaceSm),
+                        SilkButton(
+                          label: '+ 1,000',
+                          onPressed: () => setState(
+                            () => _counterValue += 1000,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Progress Ring ──────────────────────────────────────────────
+            _Section(
+              title: 'Progress Ring',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        SilkProgressRing(
+                          value: _ringValue,
+                          size: 80,
+                          child: Text(
+                            '${(_ringValue * 100).round()}%',
+                            style: tokens.bodySmStyle.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        SilkProgressRing(
+                          value: _ringValue * 0.6,
+                          size: 64,
+                          strokeWidth: 6,
+                          color: tokens.success,
+                        ),
+                        SilkProgressRing(
+                          value: _ringValue * 0.3,
+                          size: 48,
+                          strokeWidth: 5,
+                          color: const Color(0xFF6366F1),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    SilkSlider(
+                      value: _ringValue,
+                      label: 'Adjust value',
+                      showValue: true,
+                      valueFormatter: (v) => '${(v * 100).round()}%',
+                      onChanged: (v) => setState(() => _ringValue = v),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Keypad ─────────────────────────────────────────────────────
+            _Section(
+              title: 'Keypad',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: tokens.spaceLg,
+                        vertical: tokens.spaceMd,
+                      ),
+                      decoration: BoxDecoration(
+                        color: tokens.surfaceMuted,
+                        borderRadius:
+                            BorderRadius.circular(tokens.radiusMd),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _keypadInput.isEmpty ? '——' : _keypadInput,
+                            style: tokens.displayStyle,
+                          ),
+                          if (_keypadInput.isNotEmpty)
+                            GestureDetector(
+                              onTap: () =>
+                                  setState(() => _keypadInput = ''),
+                              child: Icon(
+                                Icons.close,
+                                color: tokens.onSurfaceMuted,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    SilkKeypad(
+                      showDecimal: true,
+                      onKeyTap: (digit) => setState(
+                        () => _keypadInput += digit,
+                      ),
+                      onDelete: () => setState(() {
+                        if (_keypadInput.isNotEmpty) {
+                          _keypadInput = _keypadInput.substring(
+                            0,
+                            _keypadInput.length - 1,
+                          );
+                        }
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Document Picker ────────────────────────────────────────────
+            _Section(
+              title: 'Document Picker',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    SilkDocumentPicker(
+                      label: 'Identity document',
+                      hint: 'Upload passport or national ID',
+                      acceptedFormats: 'PDF · JPG · PNG  ·  max 5 MB',
+                      status: _docStatus,
+                      fileName: _docName,
+                      onPick: () => setState(() {
+                        _docName = 'passport_scan.jpg';
+                        _docStatus = SilkDocumentStatus.selected;
+                      }),
+                      onRemove: () => setState(() {
+                        _docName = null;
+                        _docStatus = SilkDocumentStatus.empty;
+                      }),
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    Wrap(
+                      spacing: tokens.spaceSm,
+                      runSpacing: tokens.spaceSm,
+                      children: [
+                        SilkButton(
+                          label: 'Uploading',
+                          variant: SilkButtonVariant.secondary,
+                          onPressed: () => setState(() {
+                            _docName = 'passport_scan.jpg';
+                            _docStatus = SilkDocumentStatus.uploading;
+                          }),
+                        ),
+                        SilkButton(
+                          label: 'Done',
+                          variant: SilkButtonVariant.secondary,
+                          onPressed: () => setState(() {
+                            _docName = 'passport_scan.jpg';
+                            _docStatus = SilkDocumentStatus.done;
+                          }),
+                        ),
+                        SilkButton(
+                          label: 'Error',
+                          variant: SilkButtonVariant.secondary,
+                          onPressed: () => setState(() {
+                            _docName = 'passport_scan.jpg';
+                            _docStatus = SilkDocumentStatus.error;
+                          }),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Date Range Picker ──────────────────────────────────────────
+            _Section(
+              title: 'Date Range Picker',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkDateRangePicker(
+                  label: 'Transaction period',
+                  value: _dateRange,
+                  onChanged: (r) => setState(() => _dateRange = r),
+                ),
+              ),
+            ),
+
+            // ── Tag ────────────────────────────────────────────────────────
+            _Section(
+              title: 'Tag',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Wrap(
+                  spacing: tokens.spaceSm,
+                  runSpacing: tokens.spaceSm,
+                  children: const [
+                    SilkTag(label: 'Accent', variant: SilkTagVariant.accent),
+                    SilkTag(label: 'Success', variant: SilkTagVariant.success),
+                    SilkTag(label: 'Warning', variant: SilkTagVariant.warning),
+                    SilkTag(label: 'Danger', variant: SilkTagVariant.danger),
+                    SilkTag(label: 'Muted'),
+                    SilkTag(
+                      label: 'Verified',
+                      variant: SilkTagVariant.accent,
+                      icon: Icons.verified_outlined,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Countdown Timer ────────────────────────────────────────────
+            _Section(
+              title: 'Countdown Timer',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Resend code in',
+                              style: tokens.captionStyle
+                                  .copyWith(color: tokens.onSurfaceMuted),
+                            ),
+                            SilkCountdownTimer(
+                              key: ValueKey(_countdownKey),
+                              duration: const Duration(seconds: 30),
+                              onComplete: () => setState(() {}),
+                            ),
+                          ],
+                        ),
+                        SilkButton(
+                          label: 'Restart',
+                          variant: SilkButtonVariant.secondary,
+                          onPressed: () =>
+                              setState(() => _countdownKey++),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    Row(
+                      children: [
+                        Text('Session expires: ', style: tokens.bodySmStyle),
+                        SilkCountdownTimer(
+                          key: ValueKey(_countdownKey + 100),
+                          duration: const Duration(seconds: 90),
+                          format: SilkCountdownFormat.human,
+                          onComplete: () {},
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Carousel ───────────────────────────────────────────────────
+            _Section(
+              title: 'Carousel',
+              child: SilkCarousel(
+                height: 160,
+                autoPlay: true,
+                viewportFraction: 0.88,
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: tokens.spaceXs),
+                    decoration: BoxDecoration(
+                      color: tokens.accent,
+                      borderRadius:
+                          BorderRadius.circular(tokens.radiusLg),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Investment opportunity',
+                      style: tokens.titleStyle.copyWith(color: Colors.white),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: tokens.spaceXs),
+                    decoration: BoxDecoration(
+                      color: tokens.success,
+                      borderRadius:
+                          BorderRadius.circular(tokens.radiusLg),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Portfolio growth',
+                      style: tokens.titleStyle.copyWith(color: Colors.white),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: tokens.spaceXs),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6366F1),
+                      borderRadius:
+                          BorderRadius.circular(tokens.radiusLg),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'New campaign live',
+                      style: tokens.titleStyle.copyWith(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Numeric Stepper ────────────────────────────────────────────
+            _Section(
+              title: 'Numeric Stepper',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Quantity', style: tokens.bodyStyle),
+                        SilkNumericStepper(
+                          value: _numericStepperValue,
+                          min: 1,
+                          max: 10,
+                          onChanged: (v) =>
+                              setState(() => _numericStepperValue = v),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Duration', style: tokens.bodyStyle),
+                        SilkNumericStepper(
+                          value: _numericStepperValue,
+                          min: 1,
+                          max: 24,
+                          formatter: (v) => '${v}mo',
+                          onChanged: (v) =>
+                              setState(() => _numericStepperValue = v),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── FAB ────────────────────────────────────────────────────────
+            _Section(
+              title: 'FAB',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Wrap(
+                  spacing: tokens.spaceMd,
+                  runSpacing: tokens.spaceMd,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    SilkFAB(
+                      icon: Icons.add,
+                      size: SilkFABSize.sm,
+                      onPressed: () {},
+                    ),
+                    SilkFAB(icon: Icons.add, onPressed: () {}),
+                    SilkFAB(
+                      icon: Icons.add,
+                      size: SilkFABSize.lg,
+                      onPressed: () {},
+                    ),
+                    SilkFAB(
+                      icon: Icons.edit_outlined,
+                      label: 'New investment',
+                      onPressed: () {},
+                    ),
+                    SilkFAB(
+                      icon: Icons.share_outlined,
+                      variant: SilkFABVariant.surface,
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Infinite Scroll ────────────────────────────────────────────
+            _Section(
+              title: 'Infinite Scroll',
+              child: SizedBox(
+                height: 280,
+                child: ListView.builder(
+                  physics: const ClampingScrollPhysics(),
+                  itemCount: _infiniteItems.length + 1,
+                  itemBuilder: (context, i) {
+                    if (i == _infiniteItems.length) {
+                      return SilkInfiniteScroll(
+                        hasMore: _infiniteHasMore,
+                        isLoading: _infiniteLoading,
+                        onLoadMore: _loadMoreItems,
+                      );
+                    }
+                    final item = _infiniteItems[i];
+                    return SilkListTile(
+                      title: Text('Item #$item', style: tokens.bodyStyle),
+                      subtitle: Text(
+                        'Scroll down to load more',
+                        style: tokens.captionStyle
+                            .copyWith(color: tokens.onSurfaceMuted),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+
+            // ── Banner ────────────────────────────────────────────────────
+            _Section(
+              title: 'Banner',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    SilkBanner(
+                      variant: SilkBannerVariant.info,
+                      title: 'KYC required',
+                      body: 'Complete identity verification to unlock full access.',
+                      actionLabel: 'Verify now',
+                      onAction: () {},
+                    ),
+                    SizedBox(height: tokens.spaceSm),
+                    SilkBanner(
+                      variant: SilkBannerVariant.success,
+                      title: 'Payment successful',
+                      body: r'Your investment of $500 has been confirmed.',
+                      onDismiss: () {},
+                    ),
+                    SizedBox(height: tokens.spaceSm),
+                    const SilkBanner(
+                      variant: SilkBannerVariant.warning,
+                      title: 'Account limit approaching',
+                      body: 'You have used 80% of your monthly transaction limit.',
+                    ),
+                    SizedBox(height: tokens.spaceSm),
+                    const SilkBanner(
+                      variant: SilkBannerVariant.danger,
+                      body: 'Two-factor authentication is not enabled on your account.',
+                    ),
+                    SizedBox(height: tokens.spaceSm),
+                    const SilkBanner(
+                      variant: SilkBannerVariant.promo,
+                      title: 'Refer & earn',
+                      body: 'Invite a friend and earn ₵50 when they invest.',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Timeline ──────────────────────────────────────────────────
+            _Section(
+              title: 'Timeline',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: const SilkTimeline(
+                  items: [
+                    SilkTimelineItem(
+                      title: 'Order placed',
+                      subtitle: 'Payment confirmed',
+                      timestamp: '09:41',
+                    ),
+                    SilkTimelineItem(
+                      title: 'Processing',
+                      subtitle: 'Preparing your items',
+                      timestamp: '10:05',
+                    ),
+                    SilkTimelineItem(
+                      title: 'Shipped',
+                      status: SilkTimelineStatus.active,
+                      subtitle: 'In transit — ETA tomorrow',
+                      timestamp: '14:22',
+                      icon: Icons.local_shipping_outlined,
+                    ),
+                    SilkTimelineItem(
+                      title: 'Out for delivery',
+                      status: SilkTimelineStatus.pending,
+                    ),
+                    SilkTimelineItem(
+                      title: 'Delivered',
+                      status: SilkTimelineStatus.pending,
+                      icon: Icons.home_outlined,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Pin Dots ──────────────────────────────────────────────────
+            _Section(
+              title: 'Pin Dots',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    SilkPinDots(
+                      length: 4,
+                      filled: _pinFilled,
+                      hasError: _pinError,
+                    ),
+                    SizedBox(height: tokens.spaceLg),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SilkButton(
+                          label: 'Fill',
+                          variant: SilkButtonVariant.secondary,
+                          onPressed: _pinFilled < 4
+                              ? () => setState(() {
+                                    _pinFilled++;
+                                    _pinError = false;
+                                  })
+                              : null,
+                        ),
+                        SizedBox(width: tokens.spaceSm),
+                        SilkButton(
+                          label: 'Clear',
+                          variant: SilkButtonVariant.secondary,
+                          onPressed: _pinFilled > 0
+                              ? () => setState(() {
+                                    _pinFilled--;
+                                    _pinError = false;
+                                  })
+                              : null,
+                        ),
+                        SizedBox(width: tokens.spaceSm),
+                        SilkButton(
+                          label: 'Error',
+                          variant: SilkButtonVariant.destructive,
+                          onPressed: () =>
+                              setState(() => _pinError = true),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Sort & Filter Bar ─────────────────────────────────────────
+            _Section(
+              title: 'Sort & Filter Bar',
+              child: SilkSortFilterBar<String>(
+                filters: const [
+                  SilkFilterChip(value: 'all', label: 'All'),
+                  SilkFilterChip(value: 'credit', label: 'Credits'),
+                  SilkFilterChip(value: 'debit', label: 'Debits'),
+                  SilkFilterChip(value: 'pending', label: 'Pending'),
+                  SilkFilterChip(value: 'failed', label: 'Failed'),
+                ],
+                selected: _sortFilter,
+                onSelected: (v) => setState(() => _sortFilter = v),
+                onSortTap: () =>
+                    setState(() => _sortActive = !_sortActive),
+                sortActive: _sortActive,
+              ),
+            ),
+
+            // ── Rating ────────────────────────────────────────────────────
+            _Section(
+              title: 'Rating',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        SilkRating(
+                          value: _rating,
+                          onChanged: (v) =>
+                              setState(() => _rating = v),
+                        ),
+                        SizedBox(width: tokens.spaceMd),
+                        Text(
+                          _rating.toStringAsFixed(1),
+                          style: tokens.bodyStyle
+                              .copyWith(fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    Row(
+                      children: [
+                        const SilkRating(value: 4.5),
+                        SizedBox(width: tokens.spaceSm),
+                        Text(
+                          '4.5 · read-only with half star',
+                          style: tokens.captionStyle
+                              .copyWith(color: tokens.onSurfaceMuted),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Action Sheet ──────────────────────────────────────────────
+            _Section(
+              title: 'Action Sheet',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkButton(
+                  label: 'Open action sheet',
+                  variant: SilkButtonVariant.secondary,
+                  onPressed: () => unawaited(
+                    SilkActionSheet.show(
+                      context: context,
+                      title: 'Transaction options',
+                      message:
+                          'What would you like to do with this transaction?',
+                      actions: [
+                        SilkActionItem(
+                          label: 'Download receipt',
+                          icon: Icons.download_outlined,
+                          onTap: () {},
+                        ),
+                        SilkActionItem(
+                          label: 'Share transaction',
+                          icon: Icons.share_outlined,
+                          onTap: () {},
+                        ),
+                        SilkActionItem(
+                          label: 'Report an issue',
+                          icon: Icons.flag_outlined,
+                          onTap: () {},
+                        ),
+                        SilkActionItem(
+                          label: 'Reverse transaction',
+                          icon: Icons.undo_outlined,
+                          isDestructive: true,
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // ── Dialog ────────────────────────────────────────────────────
+            _Section(
+              title: 'Dialog',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Wrap(
+                  spacing: tokens.spaceSm,
+                  runSpacing: tokens.spaceSm,
+                  children: [
+                    SilkButton(
+                      label: 'Confirm',
+                      variant: SilkButtonVariant.secondary,
+                      onPressed: () => unawaited(
+                        SilkDialog.confirm(
+                          context: context,
+                          title: 'Withdraw funds',
+                          message:
+                              r'Are you sure you want to withdraw $500 from your account?',
+                          confirmLabel: 'Withdraw',
+                        ),
+                      ),
+                    ),
+                    SilkButton(
+                      label: 'Destructive',
+                      variant: SilkButtonVariant.secondary,
+                      onPressed: () => unawaited(
+                        SilkDialog.confirm(
+                          context: context,
+                          title: 'Delete account',
+                          message:
+                              'This action is permanent and cannot be undone. All your data will be deleted.',
+                          confirmLabel: 'Delete account',
+                          isDestructive: true,
+                        ),
+                      ),
                     ),
                   ],
                 ),
