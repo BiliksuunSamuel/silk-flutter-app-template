@@ -30,6 +30,7 @@ dependencies:
   json_annotation: ^4.9.0
   logger: ^2.5.0
   permission_handler: ^11.4.0
+  qr_flutter: ^4.1.0
   riverpod_annotation: ^2.6.1
   shared_preferences: ^2.3.5
   widgetbook: ^3.10.0

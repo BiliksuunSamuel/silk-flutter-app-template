@@ -5,44 +5,64 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
 import 'package:silk/core/theme/theme_mode_provider.dart';
 import 'package:silk/features/auth/presentation/providers/session_provider.dart';
+import 'package:silk/shared/widgets/silk_accordion.dart';
 import 'package:silk/shared/widgets/silk_action_sheet.dart';
 import 'package:silk/shared/widgets/silk_alert.dart';
 import 'package:silk/shared/widgets/silk_amount_field.dart';
 import 'package:silk/shared/widgets/silk_animated_counter.dart';
 import 'package:silk/shared/widgets/silk_app_bar.dart';
 import 'package:silk/shared/widgets/silk_avatar.dart';
+import 'package:silk/shared/widgets/silk_avatar_group.dart';
 import 'package:silk/shared/widgets/silk_badge.dart';
 import 'package:silk/shared/widgets/silk_banner.dart';
+import 'package:silk/shared/widgets/silk_bar_chart.dart';
+import 'package:silk/shared/widgets/silk_biometric_button.dart';
 import 'package:silk/shared/widgets/silk_bottom_nav_bar.dart';
 import 'package:silk/shared/widgets/silk_bottom_sheet.dart';
 import 'package:silk/shared/widgets/silk_button.dart';
 import 'package:silk/shared/widgets/silk_calendar.dart';
 import 'package:silk/shared/widgets/silk_card.dart';
 import 'package:silk/shared/widgets/silk_carousel.dart';
+import 'package:silk/shared/widgets/silk_chat_bubble.dart';
 import 'package:silk/shared/widgets/silk_checkbox.dart';
 import 'package:silk/shared/widgets/silk_chip.dart';
+import 'package:silk/shared/widgets/silk_confetti.dart';
 import 'package:silk/shared/widgets/silk_context_menu.dart';
+import 'package:silk/shared/widgets/silk_copy_field.dart';
 import 'package:silk/shared/widgets/silk_countdown_timer.dart';
+import 'package:silk/shared/widgets/silk_country_picker.dart';
+import 'package:silk/shared/widgets/silk_currency_picker.dart';
 import 'package:silk/shared/widgets/silk_date_picker.dart';
 import 'package:silk/shared/widgets/silk_date_range_picker.dart';
 import 'package:silk/shared/widgets/silk_date_time_picker.dart';
 import 'package:silk/shared/widgets/silk_dialog.dart';
 import 'package:silk/shared/widgets/silk_divider.dart';
 import 'package:silk/shared/widgets/silk_document_picker.dart';
+import 'package:silk/shared/widgets/silk_donut_chart.dart';
 import 'package:silk/shared/widgets/silk_dropdown.dart';
 import 'package:silk/shared/widgets/silk_empty_state.dart';
 import 'package:silk/shared/widgets/silk_expandable.dart';
 import 'package:silk/shared/widgets/silk_expandable_text.dart';
 import 'package:silk/shared/widgets/silk_fab.dart';
+import 'package:silk/shared/widgets/silk_file_upload_zone.dart';
+import 'package:silk/shared/widgets/silk_floating_label_input.dart';
+import 'package:silk/shared/widgets/silk_gauge_chart.dart';
+import 'package:silk/shared/widgets/silk_heatmap.dart';
 import 'package:silk/shared/widgets/silk_icon_button.dart';
 import 'package:silk/shared/widgets/silk_infinite_scroll.dart';
 import 'package:silk/shared/widgets/silk_keypad.dart';
+import 'package:silk/shared/widgets/silk_line_chart.dart';
 import 'package:silk/shared/widgets/silk_list_tile.dart';
 import 'package:silk/shared/widgets/silk_loading_overlay.dart';
+import 'package:silk/shared/widgets/silk_markdown_text.dart';
+import 'package:silk/shared/widgets/silk_month_picker.dart';
 import 'package:silk/shared/widgets/silk_multi_value_select_input.dart';
+import 'package:silk/shared/widgets/silk_number_range_picker.dart';
 import 'package:silk/shared/widgets/silk_numeric_stepper.dart';
 import 'package:silk/shared/widgets/silk_otp_field.dart';
+import 'package:silk/shared/widgets/silk_password_strength.dart';
 import 'package:silk/shared/widgets/silk_phone_input.dart';
+import 'package:silk/shared/widgets/silk_pie_chart.dart';
 import 'package:silk/shared/widgets/silk_pin_dots.dart';
 import 'package:silk/shared/widgets/silk_progress_bar.dart';
 import 'package:silk/shared/widgets/silk_progress_ring.dart';
@@ -50,21 +70,31 @@ import 'package:silk/shared/widgets/silk_pull_to_refresh.dart';
 import 'package:silk/shared/widgets/silk_radio_group.dart';
 import 'package:silk/shared/widgets/silk_rating.dart';
 import 'package:silk/shared/widgets/silk_reaction_burst.dart';
+import 'package:silk/shared/widgets/silk_receipt_card.dart';
 import 'package:silk/shared/widgets/silk_search_bar.dart';
 import 'package:silk/shared/widgets/silk_segmented_control.dart';
 import 'package:silk/shared/widgets/silk_shimmer.dart';
+import 'package:silk/shared/widgets/silk_signature_pad.dart';
 import 'package:silk/shared/widgets/silk_skeleton.dart';
 import 'package:silk/shared/widgets/silk_slider.dart';
 import 'package:silk/shared/widgets/silk_sort_filter_bar.dart';
+import 'package:silk/shared/widgets/silk_sparkline.dart';
+import 'package:silk/shared/widgets/silk_stat_card.dart';
+import 'package:silk/shared/widgets/silk_step_wizard.dart';
 import 'package:silk/shared/widgets/silk_stepper.dart';
 import 'package:silk/shared/widgets/silk_swipe_action.dart';
+import 'package:silk/shared/widgets/silk_swipe_to_confirm.dart';
 import 'package:silk/shared/widgets/silk_switch.dart';
 import 'package:silk/shared/widgets/silk_tab_bar.dart';
+import 'package:silk/shared/widgets/silk_table_view.dart';
 import 'package:silk/shared/widgets/silk_tag.dart';
+import 'package:silk/shared/widgets/silk_text_area.dart';
 import 'package:silk/shared/widgets/silk_text_field.dart';
 import 'package:silk/shared/widgets/silk_time_picker.dart';
 import 'package:silk/shared/widgets/silk_timeline.dart';
 import 'package:silk/shared/widgets/silk_toast.dart';
+import 'package:silk/shared/widgets/silk_toggle_card.dart';
+import 'package:silk/shared/widgets/silk_tooltip.dart';
 
 class HomeStubScreen extends ConsumerStatefulWidget {
   const HomeStubScreen({super.key});
@@ -112,6 +142,20 @@ class _HomeStubScreenState extends ConsumerState<HomeStubScreen> {
   bool _sortActive = false;
   int _pinFilled = 0;
   bool _pinError = false;
+  SilkCountry? _country;
+  SilkCurrency? _currency;
+  bool _swipeConfirmed = false;
+  final _passwordController = TextEditingController();
+  SilkBiometricState _bioState = SilkBiometricState.idle;
+  String _plan = 'basic';
+  DateTime? _reportMonth;
+  double _rangeStart = 1000;
+  double _rangeEnd = 8000;
+  final _textAreaController = TextEditingController();
+  final _sigCtrl = SilkSignaturePadController();
+  int? _pieSelectedIndex;
+  String? _uploadFileName;
+  final _floatingInputCtrl = TextEditingController();
 
   static final _countries = [
     const SilkSelectItem(value: 'ng', label: 'Nigeria'),
@@ -126,6 +170,10 @@ class _HomeStubScreenState extends ConsumerState<HomeStubScreen> {
   void dispose() {
     _textController.dispose();
     _searchController.dispose();
+    _passwordController.dispose();
+    _textAreaController.dispose();
+    _floatingInputCtrl.dispose();
+    _sigCtrl.dispose();
     super.dispose();
   }
 
@@ -145,6 +193,21 @@ class _HomeStubScreenState extends ConsumerState<HomeStubScreen> {
       _infiniteLoading = false;
       if (_infiniteItems.length >= 20) _infiniteHasMore = false;
     });
+  }
+
+  Future<void> _simulateBiometric() async {
+    setState(() => _bioState = SilkBiometricState.authenticating);
+    await Future<void>.delayed(const Duration(milliseconds: 1800));
+    if (!mounted) return;
+    setState(() => _bioState = SilkBiometricState.success);
+    SilkConfetti.burst(context);
+  }
+
+  Future<void> _triggerBioFailure() async {
+    setState(() => _bioState = SilkBiometricState.failure);
+    await Future<void>.delayed(const Duration(milliseconds: 1200));
+    if (!mounted) return;
+    setState(() => _bioState = SilkBiometricState.idle);
   }
 
   @override
@@ -1029,6 +1092,611 @@ class _HomeStubScreenState extends ConsumerState<HomeStubScreen> {
                       ),
                     );
                   },
+                ),
+              ),
+            ),
+
+            // ── Confetti ──────────────────────────────────────────────────
+            _Section(
+              title: 'Confetti',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Overlay burst — no widget setup required.',
+                      style: tokens.captionStyle
+                          .copyWith(color: tokens.onSurfaceMuted),
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    Wrap(
+                      spacing: tokens.spaceSm,
+                      runSpacing: tokens.spaceSm,
+                      children: [
+                        SilkButton(
+                          label: 'Burst!',
+                          onPressed: () => SilkConfetti.burst(context),
+                        ),
+                        SilkButton(
+                          label: 'More particles',
+                          variant: SilkButtonVariant.secondary,
+                          onPressed: () => SilkConfetti.burst(
+                            context,
+                            particleCount: 200,
+                          ),
+                        ),
+                        SilkButton(
+                          label: 'Custom colours',
+                          variant: SilkButtonVariant.secondary,
+                          onPressed: () => SilkConfetti.burst(
+                            context,
+                            colors: [
+                              tokens.accent,
+                              tokens.success,
+                              Colors.white,
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Biometric Button ──────────────────────────────────────────
+            _Section(
+              title: 'Biometric Button',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Column(
+                          children: [
+                            SilkBiometricButton(
+                              type: SilkBiometricType.fingerprint,
+                              state: _bioState,
+                              onPressed: _simulateBiometric,
+                            ),
+                            SizedBox(height: tokens.spaceXs),
+                            Text(
+                              'Fingerprint',
+                              style: tokens.captionStyle
+                                  .copyWith(color: tokens.onSurfaceMuted),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            SilkBiometricButton(
+                              type: SilkBiometricType.faceId,
+                              state: _bioState,
+                              onPressed: _simulateBiometric,
+                            ),
+                            SizedBox(height: tokens.spaceXs),
+                            Text(
+                              'Face ID',
+                              style: tokens.captionStyle
+                                  .copyWith(color: tokens.onSurfaceMuted),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: tokens.spaceLg),
+                    Wrap(
+                      spacing: tokens.spaceSm,
+                      runSpacing: tokens.spaceSm,
+                      children: [
+                        SilkButton(
+                          label: 'Authenticate',
+                          onPressed: _bioState ==
+                                  SilkBiometricState.authenticating
+                              ? null
+                              : _simulateBiometric,
+                        ),
+                        SilkButton(
+                          label: 'Fail',
+                          variant: SilkButtonVariant.destructive,
+                          onPressed: _triggerBioFailure,
+                        ),
+                        SilkButton(
+                          label: 'Reset',
+                          variant: SilkButtonVariant.secondary,
+                          onPressed: () => setState(
+                            () => _bioState = SilkBiometricState.idle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Copy Field ────────────────────────────────────────────────
+            _Section(
+              title: 'Copy Field',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    const SilkCopyField(
+                      label: 'Account number',
+                      value: '1234567890',
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    const SilkCopyField(
+                      label: 'Card number',
+                      value: '4111111111114242',
+                      obscure: true,
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    const SilkCopyField(
+                      label: 'Reference code',
+                      value: 'TXN-2026-AB7F3C',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Avatar Group ──────────────────────────────────────────────
+            _Section(
+              title: 'Avatar Group',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        SilkAvatarGroup(
+                          items: [
+                            const SilkAvatarItem(initials: 'AS'),
+                            SilkAvatarItem(
+                              initials: 'BH',
+                              color: tokens.success,
+                            ),
+                            const SilkAvatarItem(initials: 'CK'),
+                            const SilkAvatarItem(initials: 'DM'),
+                            const SilkAvatarItem(initials: 'EF'),
+                            const SilkAvatarItem(initials: 'GR'),
+                            const SilkAvatarItem(initials: 'HT'),
+                          ],
+                          max: 4,
+                        ),
+                        SizedBox(width: tokens.spaceMd),
+                        Text(
+                          '7 co-investors',
+                          style: tokens.bodySmStyle
+                              .copyWith(color: tokens.onSurfaceMuted),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    SilkAvatarGroup(
+                      items: [
+                        SilkAvatarItem(
+                          initials: 'QA',
+                          color: tokens.accent,
+                        ),
+                        const SilkAvatarItem(
+                          initials: 'WB',
+                          color: Color(0xFF6366F1),
+                        ),
+                        const SilkAvatarItem(initials: 'EC'),
+                      ],
+                      size: 28,
+                      overlap: 8,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Password Strength ─────────────────────────────────────────
+            _Section(
+              title: 'Password Strength',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    SilkTextField(
+                      hint: 'Enter a password…',
+                      controller: _passwordController,
+                      obscureText: true,
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    SizedBox(height: tokens.spaceSm),
+                    SilkPasswordStrength(
+                      password: _passwordController.text,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Receipt Card ──────────────────────────────────────────────
+            _Section(
+              title: 'Receipt Card',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: const SilkReceiptCard(
+                  title: 'Payment summary',
+                  icon: Icons.receipt_long_outlined,
+                  lines: [
+                    SilkReceiptLine(
+                      label: 'Investment amount',
+                      value: r'$2,500.00',
+                    ),
+                    SilkReceiptLine(
+                      label: 'Processing fee',
+                      value: r'$12.50',
+                      muted: true,
+                    ),
+                    SilkReceiptLine(
+                      label: 'Platform fee',
+                      value: r'$5.00',
+                      muted: true,
+                    ),
+                    SilkReceiptLine(
+                      label: 'Total charged',
+                      value: r'$2,517.50',
+                      isTotal: true,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Sparkline ─────────────────────────────────────────────────
+            _Section(
+              title: 'Sparkline',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SilkCard(
+                            hasBorder: true,
+                            child: Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Portfolio',
+                                      style: tokens.captionStyle.copyWith(
+                                        color: tokens.onSurfaceMuted,
+                                      ),
+                                    ),
+                                    Text(
+                                      r'$12,480',
+                                      style: tokens.titleStyle,
+                                    ),
+                                    Text(
+                                      '+8.4%',
+                                      style: tokens.captionStyle.copyWith(
+                                        color: tokens.success,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SilkSparkline(
+                                  data: const [
+                                    9800, 10200, 9900, 11000,
+                                    10800, 11500, 12480,
+                                  ],
+                                  color: tokens.success,
+                                  height: 48,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SilkCard(
+                            hasBorder: true,
+                            child: Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Bond fund',
+                                      style: tokens.captionStyle.copyWith(
+                                        color: tokens.onSurfaceMuted,
+                                      ),
+                                    ),
+                                    Text(
+                                      r'$4,210',
+                                      style: tokens.titleStyle,
+                                    ),
+                                    Text(
+                                      '−1.2%',
+                                      style: tokens.captionStyle.copyWith(
+                                        color: tokens.danger,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SilkSparkline(
+                                  data: const [
+                                    4500, 4420, 4380, 4460,
+                                    4300, 4250, 4210,
+                                  ],
+                                  color: tokens.danger,
+                                  height: 48,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Donut Chart ───────────────────────────────────────────────
+            _Section(
+              title: 'Donut Chart',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Row(
+                  children: [
+                    SilkDonutChart(
+                      size: 140,
+                      segments: [
+                        SilkDonutSegment(
+                          value: 55,
+                          color: tokens.accent,
+                          label: 'Equities',
+                        ),
+                        SilkDonutSegment(
+                          value: 25,
+                          color: tokens.success,
+                          label: 'Bonds',
+                        ),
+                        const SilkDonutSegment(
+                          value: 12,
+                          color: Color(0xFF6366F1),
+                          label: 'Real estate',
+                        ),
+                        const SilkDonutSegment(
+                          value: 8,
+                          color: Color(0xFFF59E0B),
+                          label: 'Cash',
+                        ),
+                      ],
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('55%', style: tokens.titleStyle),
+                          Text(
+                            'equity',
+                            style: tokens.captionStyle
+                                .copyWith(color: tokens.onSurfaceMuted),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: tokens.spaceLg),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _LegendRow(
+                            color: tokens.accent,
+                            label: 'Equities',
+                            pct: '55%',
+                          ),
+                          SizedBox(height: tokens.spaceSm),
+                          _LegendRow(
+                            color: tokens.success,
+                            label: 'Bonds',
+                            pct: '25%',
+                          ),
+                          SizedBox(height: tokens.spaceSm),
+                          const _LegendRow(
+                            color: Color(0xFF6366F1),
+                            label: 'Real estate',
+                            pct: '12%',
+                          ),
+                          SizedBox(height: tokens.spaceSm),
+                          const _LegendRow(
+                            color: Color(0xFFF59E0B),
+                            label: 'Cash',
+                            pct: '8%',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Bar Chart ─────────────────────────────────────────────────
+            _Section(
+              title: 'Bar Chart',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkBarChart(
+                  height: 160,
+                  showValues: true,
+                  entries: [
+                    const SilkBarEntry(label: 'Jan', value: 4200),
+                    const SilkBarEntry(label: 'Feb', value: 3800),
+                    const SilkBarEntry(label: 'Mar', value: 5100),
+                    SilkBarEntry(
+                      label: 'Apr',
+                      value: 4750,
+                      color: tokens.success,
+                    ),
+                    const SilkBarEntry(label: 'May', value: 6200),
+                    SilkBarEntry(
+                      label: 'Jun',
+                      value: 3200,
+                      color: tokens.danger,
+                    ),
+                    const SilkBarEntry(label: 'Jul', value: 5900),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Swipe to Confirm ──────────────────────────────────────────
+            _Section(
+              title: 'Swipe to Confirm',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    SilkSwipeToConfirm(
+                      label: 'Swipe to send ₵500',
+                      onConfirmed: () =>
+                          setState(() => _swipeConfirmed = true),
+                    ),
+                    if (_swipeConfirmed) ...[
+                      SizedBox(height: tokens.spaceMd),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Payment confirmed!',
+                            style: tokens.bodyStyle
+                                .copyWith(color: tokens.success),
+                          ),
+                          SizedBox(width: tokens.spaceSm),
+                          SilkButton(
+                            label: 'Reset',
+                            variant: SilkButtonVariant.ghost,
+                            onPressed: () =>
+                                setState(() => _swipeConfirmed = false),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Tooltip ───────────────────────────────────────────────────
+            _Section(
+              title: 'Tooltip',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tap the info icons to reveal tooltips.',
+                      style: tokens.captionStyle
+                          .copyWith(color: tokens.onSurfaceMuted),
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    SilkCard(
+                      hasBorder: true,
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Text('Processing fee', style: tokens.bodySmStyle),
+                                  SizedBox(width: tokens.spaceXs),
+                                  SilkTooltip(
+                                    message:
+                                        'A 0.5% fee charged by the payment processor for each transaction.',
+                                    child: Icon(
+                                      Icons.info_outline,
+                                      size: 14,
+                                      color: tokens.onSurfaceMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(r'$2.50', style: tokens.bodySmStyle),
+                            ],
+                          ),
+                          SizedBox(height: tokens.spaceSm),
+                          Row(
+                            mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Text('Platform fee', style: tokens.bodySmStyle),
+                                  SizedBox(width: tokens.spaceXs),
+                                  SilkTooltip(
+                                    message:
+                                        'Annual platform fee of 1.2% charged quarterly on invested capital.',
+                                    child: Icon(
+                                      Icons.info_outline,
+                                      size: 14,
+                                      color: tokens.onSurfaceMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(r'$6.00', style: tokens.bodySmStyle),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Country Picker ────────────────────────────────────────────
+            _Section(
+              title: 'Country Picker',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkCountryPicker(
+                  label: 'Country of residence',
+                  selected: _country,
+                  onChanged: (c) => setState(() => _country = c),
+                ),
+              ),
+            ),
+
+            // ── Currency Picker ───────────────────────────────────────────
+            _Section(
+              title: 'Currency Picker',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkCurrencyPicker(
+                  label: 'Base currency',
+                  selected: _currency,
+                  onChanged: (c) => setState(() => _currency = c),
                 ),
               ),
             ),
@@ -2179,6 +2847,456 @@ class _HomeStubScreenState extends ConsumerState<HomeStubScreen> {
                 ],
               ),
             )),
+
+            // ── Stat Card ──────────────────────────────────────────────────
+            _Section(
+              title: 'Stat Card',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    const SilkStatCard(
+                      label: 'Total Portfolio',
+                      value: r'$12,480',
+                      delta: 8.4,
+                      deltaLabel: 'vs last month',
+                      icon: Icons.account_balance_wallet_outlined,
+                      sparklineData: [9800, 10200, 10800, 11400, 12480],
+                    ),
+                    SizedBox(height: tokens.spaceSm),
+                    const SilkStatCard(
+                      label: 'Fixed Income',
+                      value: r'$3,100',
+                      delta: -2.1,
+                      deltaLabel: 'vs last month',
+                      icon: Icons.trending_down_outlined,
+                      sparklineData: [3400, 3300, 3200, 3150, 3100],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Toggle Card ────────────────────────────────────────────────
+            _Section(
+              title: 'Toggle Card',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    SilkToggleCard(
+                      title: 'Basic',
+                      description: 'Free · up to 2 projects',
+                      icon: Icons.layers_outlined,
+                      selected: _plan == 'basic',
+                      onTap: () => setState(() => _plan = 'basic'),
+                    ),
+                    SizedBox(height: tokens.spaceSm),
+                    SilkToggleCard(
+                      title: 'Pro',
+                      description: r'$9 / month · unlimited projects',
+                      icon: Icons.rocket_launch_outlined,
+                      selected: _plan == 'pro',
+                      onTap: () => setState(() => _plan = 'pro'),
+                    ),
+                    SizedBox(height: tokens.spaceSm),
+                    SilkToggleCard(
+                      title: 'Enterprise',
+                      description: 'Custom pricing · team features',
+                      icon: Icons.business_outlined,
+                      selected: _plan == 'enterprise',
+                      onTap: () => setState(() => _plan = 'enterprise'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Accordion ──────────────────────────────────────────────────
+            _Section(
+              title: 'Accordion',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkAccordion(
+                  initialIndex: 0,
+                  items: [
+                    SilkAccordionItem(
+                      title: 'What is APY?',
+                      icon: Icons.percent_outlined,
+                      child: Text(
+                        'Annual Percentage Yield (APY) reflects total interest earned in one year, including compound interest.',
+                        style: tokens.bodySmStyle
+                            .copyWith(color: tokens.onSurfaceMuted),
+                      ),
+                    ),
+                    SilkAccordionItem(
+                      title: 'When do I get paid?',
+                      icon: Icons.schedule_outlined,
+                      child: Text(
+                        'Interest is credited on the first business day of each month. Withdrawals settle within 2 business days.',
+                        style: tokens.bodySmStyle
+                            .copyWith(color: tokens.onSurfaceMuted),
+                      ),
+                    ),
+                    SilkAccordionItem(
+                      title: 'Is my money insured?',
+                      icon: Icons.shield_outlined,
+                      child: Text(
+                        'Deposits are protected up to GH₵100,000 per depositor by the Ghana Deposit Protection Corporation.',
+                        style: tokens.bodySmStyle
+                            .copyWith(color: tokens.onSurfaceMuted),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Line Chart ─────────────────────────────────────────────────
+            _Section(
+              title: 'Line Chart',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkLineChart(
+                  series: [
+                    SilkLineSeries(
+                      label: 'Portfolio',
+                      data: const [9800, 10200, 11000, 10800, 12480, 13100],
+                      color: tokens.accent,
+                    ),
+                    SilkLineSeries(
+                      label: 'Benchmark',
+                      data: const [10000, 10100, 10300, 10500, 10900, 11200],
+                      color: tokens.onSurfaceMuted,
+                      filled: false,
+                    ),
+                  ],
+                  xLabels: const ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                  height: 200,
+                ),
+              ),
+            ),
+
+            // ── Table View ─────────────────────────────────────────────────
+            _Section(
+              title: 'Table View',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: const SilkTableView(
+                  columns: [
+                    SilkTableColumn(label: 'Asset', flex: 2),
+                    SilkTableColumn(
+                      label: 'Value',
+                      numeric: true,
+                      alignment: TextAlign.right,
+                    ),
+                    SilkTableColumn(
+                      label: 'Return',
+                      numeric: true,
+                      alignment: TextAlign.right,
+                    ),
+                  ],
+                  rows: [
+                    ['Equities', r'$8,200', '+12.4%'],
+                    ['Bonds', r'$3,100', '+4.1%'],
+                    ['Cash', r'$1,180', '+1.8%'],
+                    ['Alternatives', r'$2,400', '-2.3%'],
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Month Picker ───────────────────────────────────────────────
+            _Section(
+              title: 'Month Picker',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkMonthPicker(
+                  label: 'Report period',
+                  value: _reportMonth,
+                  onChanged: (m) => setState(() => _reportMonth = m),
+                ),
+              ),
+            ),
+
+            // ── Number Range Picker ────────────────────────────────────────
+            _Section(
+              title: 'Number Range Picker',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkNumberRangePicker(
+                  label: 'Investment range',
+                  min: 0,
+                  max: 10000,
+                  start: _rangeStart,
+                  end: _rangeEnd,
+                  valueFormatter: (v) => 'GH₵${v.toStringAsFixed(0)}',
+                  onChanged: (s, e) => setState(() {
+                    _rangeStart = s;
+                    _rangeEnd = e;
+                  }),
+                ),
+              ),
+            ),
+
+            // ── Text Area ──────────────────────────────────────────────────
+            _Section(
+              title: 'Text Area',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkTextArea(
+                  controller: _textAreaController,
+                  label: 'Investment notes',
+                  hint: 'Add notes about your strategy…',
+                  maxLength: 500,
+                  minLines: 4,
+                ),
+              ),
+            ),
+
+            // ── Signature Pad ──────────────────────────────────────────────
+            _Section(
+              title: 'Signature Pad',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SilkSignaturePad(controller: _sigCtrl),
+                    SizedBox(height: tokens.spaceSm),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: _sigCtrl.clear,
+                        icon: const Icon(Icons.refresh_rounded, size: 16),
+                        label: const Text('Clear'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Step Wizard ────────────────────────────────────────────────
+            _Section(
+              title: 'Step Wizard',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkStepWizard(
+                  steps: [
+                    SilkWizardStep(
+                      title: 'Personal info',
+                      child: Text(
+                        'Enter your full name, date of birth, and contact details to get started.',
+                        style: tokens.bodySmStyle
+                            .copyWith(color: tokens.onSurfaceMuted),
+                      ),
+                    ),
+                    SilkWizardStep(
+                      title: 'Identity document',
+                      child: Text(
+                        "Upload a valid national ID, passport, or driver's licence for KYC verification.",
+                        style: tokens.bodySmStyle
+                            .copyWith(color: tokens.onSurfaceMuted),
+                      ),
+                    ),
+                    SilkWizardStep(
+                      title: 'Review & Submit',
+                      child: Text(
+                        'Review your details carefully before submitting your application.',
+                        style: tokens.bodySmStyle
+                            .copyWith(color: tokens.onSurfaceMuted),
+                      ),
+                    ),
+                  ],
+                  onFinish: () => SilkToast.show(
+                    context,
+                    'Application submitted!',
+                    variant: SilkToastVariant.success,
+                  ),
+                ),
+              ),
+            ),
+            // ── Pie Chart (3D) ─────────────────────────────────────────────
+            _Section(
+              title: '3D Pie Chart',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Row(
+                  children: [
+                    SilkPieChart(
+                      size: 180,
+                      selectedIndex: _pieSelectedIndex,
+                      onSegmentTap: (i) =>
+                          setState(() => _pieSelectedIndex = i == _pieSelectedIndex ? null : i),
+                      segments: const [
+                        SilkPieSegment(value: 52, color: Color(0xFF6366F1), label: 'Equities'),
+                        SilkPieSegment(value: 24, color: Color(0xFF22C55E), label: 'Bonds'),
+                        SilkPieSegment(value: 14, color: Color(0xFFF59E0B), label: 'Cash'),
+                        SilkPieSegment(value: 10, color: Color(0xFFEC4899), label: 'Alts'),
+                      ],
+                    ),
+                    SizedBox(width: tokens.spaceLg),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Tap a slice to pop it out', style: tokens.captionStyle.copyWith(color: tokens.onSurfaceMuted)),
+                          SizedBox(height: tokens.spaceSm),
+                          const _LegendRow(color: Color(0xFF6366F1), label: 'Equities', pct: '52%'),
+                          const _LegendRow(color: Color(0xFF22C55E), label: 'Bonds', pct: '24%'),
+                          const _LegendRow(color: Color(0xFFF59E0B), label: 'Cash', pct: '14%'),
+                          const _LegendRow(color: Color(0xFFEC4899), label: 'Alternatives', pct: '10%'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Gauge Chart ────────────────────────────────────────────────
+            _Section(
+              title: 'Gauge Chart',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SilkGaugeChart(
+                      value: 74,
+                      label: 'Risk score',
+                      size: 160,
+                      gradientColors: [tokens.success, tokens.accent],
+                    ),
+                    SilkGaugeChart(
+                      value: 38,
+                      label: 'Portfolio health',
+                      size: 160,
+                      gradientColors: [tokens.danger, const Color(0xFFF59E0B)],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Heatmap ────────────────────────────────────────────────────
+            _Section(
+              title: 'Heatmap',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: SilkHeatmap(
+                  fillColor: tokens.accent,
+                  data: List.generate(
+                    18 * 7,
+                    (i) => SilkHeatmapDay(
+                      date: DateTime.now().subtract(
+                        Duration(days: 18 * 7 - 1 - i),
+                      ),
+                      value: (i % 7 == 0 || i % 11 == 0)
+                          ? 0
+                          : ((i % 5) + 1).toDouble(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // ── Chat Bubble ────────────────────────────────────────────────
+            _Section(
+              title: 'Chat Bubble',
+              child: Column(
+                children: [
+                  const SilkChatBubble(
+                    message: 'Your portfolio is up 8.4% this month 🎉',
+                    side: SilkChatSide.receiver,
+                    timestamp: '09:41',
+                  ),
+                  SilkChatBubble(
+                    message: 'Should I rebalance into bonds now?',
+                    side: SilkChatSide.sender,
+                    timestamp: '09:42',
+                    statusIcon: Icon(Icons.done_all_rounded, size: 12, color: Colors.white.withValues(alpha: 0.7)),
+                  ),
+                  const SilkChatBubble(
+                    message: 'With rates where they are, a small shift into short-duration bonds makes sense. Shall I model the impact?',
+                    side: SilkChatSide.receiver,
+                    timestamp: '09:43',
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Floating Label Input ────────────────────────────────────────
+            _Section(
+              title: 'Floating Label Input',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    SilkFloatingLabelInput(
+                      label: 'Account number',
+                      controller: _floatingInputCtrl,
+                      hint: 'e.g. 1234567890',
+                      keyboardType: TextInputType.number,
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    const SilkFloatingLabelInput(
+                      label: 'PIN',
+                      obscureText: true,
+                      errorText: 'PIN must be 4 digits',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── File Upload Zone ───────────────────────────────────────────
+            _Section(
+              title: 'File Upload Zone',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  children: [
+                    SilkFileUploadZone(
+                      fileName: _uploadFileName,
+                      fileSize: _uploadFileName != null ? '1.2 MB' : null,
+                      hint: 'Tap to upload your ID document',
+                      acceptLabel: 'PDF, JPG, PNG up to 5MB',
+                      onTap: () => setState(
+                        () => _uploadFileName = 'national_id.pdf',
+                      ),
+                      onClear: _uploadFileName != null
+                          ? () => setState(() => _uploadFileName = null)
+                          : null,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Markdown Text ──────────────────────────────────────────────
+            _Section(
+              title: 'Markdown Text',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: const SilkMarkdownText(
+                  data: '''
+## Portfolio Summary
+
+Your **Q2 2026** performance was *exceptional*:
+
+- Total return: **+12.4%**
+- Best asset: `Equities`
+- Worst asset: `Alternatives`
+
+---
+
+Review your allocation before the Q3 rebalance window opens.
+''',
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -2340,6 +3458,46 @@ class _ReactionChipState extends State<_ReactionChip> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ─── Donut chart legend row ─────────────────────────────────────────────────
+
+class _LegendRow extends StatelessWidget {
+  const _LegendRow({
+    required this.color,
+    required this.label,
+    required this.pct,
+  });
+
+  final Color color;
+  final String label;
+  final String pct;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    return Row(
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        SizedBox(width: tokens.spaceXs),
+        Expanded(
+          child: Text(
+            label,
+            style: tokens.captionStyle,
+          ),
+        ),
+        Text(
+          pct,
+          style: tokens.captionStyle
+              .copyWith(fontWeight: FontWeight.w600),
+        ),
+      ],
     );
   }
 }
