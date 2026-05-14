@@ -122,7 +122,10 @@ class _GaugePainter extends CustomPainter {
   final TextStyle subtitleStyle;
 
   static const double _startAngle = math.pi;
-  static const double _sweepAngle = -math.pi;
+
+  // Positive sweep = clockwise in Flutter's Y-down canvas = travels through
+  // 12 o'clock (top), which is what a gauge arc needs.
+  static const double _sweepAngle = math.pi;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -142,14 +145,18 @@ class _GaugePainter extends CustomPainter {
         : ((value - min) / (max - min)).clamp(0.0, 1.0);
     final filledSweep = _sweepAngle * fraction * progress;
 
-    if (fraction > 0 && progress > 0) {
+    // Guard against near-zero sweep (avoids Gradient.sweep assertion).
+    if (fraction > 0 && progress > 0 && filledSweep > 1e-4) {
+      final tipAngle = _startAngle + filledSweep; // > _startAngle (CW sweep)
+
+      // endAngle > startAngle is satisfied because filledSweep is positive.
       final gradient = ui.Gradient.sweep(
         center,
         gradientColors,
         null,
         TileMode.clamp,
         _startAngle,
-        _startAngle + filledSweep,
+        tipAngle,
       );
 
       final fillPaint = Paint()
@@ -159,7 +166,6 @@ class _GaugePainter extends CustomPainter {
         ..strokeCap = StrokeCap.round;
       canvas.drawArc(rect, _startAngle, filledSweep, false, fillPaint);
 
-      final tipAngle = _startAngle + filledSweep;
       final tipX = center.dx + radius * math.cos(tipAngle);
       final tipY = center.dy + radius * math.sin(tipAngle);
       final tipOffset = Offset(tipX, tipY);

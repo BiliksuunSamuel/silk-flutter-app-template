@@ -17,6 +17,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_animate: ^4.5.2
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
   flutter_localizations:
     sdk: flutter
   flutter_riverpod: ^2.6.1

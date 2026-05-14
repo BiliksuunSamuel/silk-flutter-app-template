@@ -21,7 +21,7 @@ class SilkLineSeries {
   final bool filled;
 }
 
-/// A line chart with labelled axes and optional touch interaction.
+/// A 3D-ribbon line chart with labelled axes and optional touch interaction.
 /// Supports multiple series. Uses smooth bezier curves.
 ///
 /// Usage:
@@ -48,6 +48,7 @@ class SilkLineChart extends StatefulWidget {
     this.yMin,
     this.yMax,
     this.gridLines = 4,
+    this.lineDepth = 5,
     super.key,
   });
 
@@ -59,6 +60,9 @@ class SilkLineChart extends StatefulWidget {
   final double? yMin;
   final double? yMax;
   final int gridLines;
+
+  /// Depth of the 3D ribbon in pixels. Set to 0 to disable.
+  final int lineDepth;
 
   @override
   State<SilkLineChart> createState() => _SilkLineChartState();
@@ -96,8 +100,8 @@ class _SilkLineChartState extends State<SilkLineChart>
     final allValues = widget.series.expand((s) => s.data).toList();
     final yMin = widget.yMin ?? allValues.reduce(math.min);
     final yMax = widget.yMax ?? allValues.reduce(math.max);
-    final maxPoints = widget.series.map((s) => s.data.length).reduce(math.max);
-    final xLabels = widget.xLabels;
+    final maxPoints =
+        widget.series.map((s) => s.data.length).reduce(math.max);
 
     return SizedBox(
       height: widget.height,
@@ -106,14 +110,15 @@ class _SilkLineChartState extends State<SilkLineChart>
         builder: (_, __) => GestureDetector(
           onTapUp: (d) {
             final frac = d.localPosition.dx / context.size!.width;
-            final idx = (frac * (maxPoints - 1)).round().clamp(0, maxPoints - 1);
+            final idx =
+                (frac * (maxPoints - 1)).round().clamp(0, maxPoints - 1);
             setState(() => _touchIndex = idx);
           },
           onTapDown: (_) => setState(() => _touchIndex = null),
           child: CustomPaint(
             painter: _LineChartPainter(
               series: widget.series,
-              xLabels: xLabels,
+              xLabels: widget.xLabels,
               yMin: yMin,
               yMax: yMax,
               maxPoints: maxPoints,
@@ -123,6 +128,7 @@ class _SilkLineChartState extends State<SilkLineChart>
               gridLines: widget.gridLines,
               gridColor: tokens.divider,
               labelColor: tokens.onSurfaceMuted,
+              lineDepth: widget.lineDepth,
               touchIndex: _touchIndex,
             ),
             child: const SizedBox.expand(),
@@ -146,6 +152,7 @@ class _LineChartPainter extends CustomPainter {
     required this.gridLines,
     required this.gridColor,
     required this.labelColor,
+    required this.lineDepth,
     this.touchIndex,
   });
 
@@ -160,6 +167,7 @@ class _LineChartPainter extends CustomPainter {
   final int gridLines;
   final Color gridColor;
   final Color labelColor;
+  final int lineDepth;
   final int? touchIndex;
 
   static const _labelHeight = 20.0;
@@ -174,6 +182,20 @@ class _LineChartPainter extends CustomPainter {
     double xOf(int i) => _leftPad + (i / (maxPoints - 1)) * chartW;
     double yOf(double v) => chartH - ((v - yMin) / yRange) * chartH;
 
+    // Builds the bezier path for a series at an optional y-offset for depth layers.
+    Path buildPath(List<double> data, int clipPts, double yOffset) {
+      final path = Path()..moveTo(xOf(0), yOf(data[0]) + yOffset);
+      for (var i = 1; i < clipPts; i++) {
+        final cpX = (xOf(i - 1) + xOf(i)) / 2;
+        path.cubicTo(
+          cpX, yOf(data[i - 1]) + yOffset,
+          cpX, yOf(data[i]) + yOffset,
+          xOf(i), yOf(data[i]) + yOffset,
+        );
+      }
+      return path;
+    }
+
     final labelPaint = TextPainter(textDirection: ui.TextDirection.ltr);
     final gridPaint = Paint()
       ..color = gridColor
@@ -184,18 +206,11 @@ class _LineChartPainter extends CustomPainter {
       for (var g = 0; g <= gridLines; g++) {
         final v = yMin + (yRange * g / gridLines);
         final y = yOf(v);
-        canvas.drawLine(
-          Offset(_leftPad, y),
-          Offset(size.width, y),
-          gridPaint,
-        );
+        canvas.drawLine(Offset(_leftPad, y), Offset(size.width, y), gridPaint);
         labelPaint
           ..text = TextSpan(
             text: _formatY(v),
-            style: TextStyle(
-              color: labelColor,
-              fontSize: 9,
-            ),
+            style: TextStyle(color: labelColor, fontSize: 9),
           )
           ..layout()
           ..paint(canvas, Offset(0, y - labelPaint.height / 2));
@@ -213,7 +228,7 @@ class _LineChartPainter extends CustomPainter {
         ..paint(canvas, Offset(xOf(i) - labelPaint.width / 2, chartH + 4));
     }
 
-    // Touch index vertical line
+    // Touch scrubber line
     if (touchIndex != null) {
       final x = xOf(touchIndex!);
       canvas.drawLine(
@@ -231,62 +246,101 @@ class _LineChartPainter extends CustomPainter {
       if (s.data.isEmpty) continue;
       final pts = s.data.length;
       final clipPts = (pts * progress).ceil().clamp(2, pts);
+      final mainPath = buildPath(s.data, clipPts, 0);
 
-      final path = Path()
-        ..moveTo(xOf(0), yOf(s.data[0]));
-      for (var i = 1; i < clipPts; i++) {
-        final x0 = xOf(i - 1);
-        final y0 = yOf(s.data[i - 1]);
-        final x1 = xOf(i);
-        final y1 = yOf(s.data[i]);
-        final cpX = (x0 + x1) / 2;
-        path.cubicTo(cpX, y0, cpX, y1, x1, y1);
-      }
-
+      // Area fill
       if (s.filled) {
         final lastX = xOf(clipPts - 1);
-        final fillPath = Path.from(path)
+        final fillPath = Path.from(mainPath)
           ..lineTo(lastX, chartH)
           ..lineTo(xOf(0), chartH)
           ..close();
-
-        final gradient = ui.Gradient.linear(
-          Offset.zero,
-          Offset(0, chartH),
-          [s.color.withValues(alpha: 0.2), s.color.withValues(alpha: 0)],
+        canvas.drawPath(
+          fillPath,
+          Paint()
+            ..shader = ui.Gradient.linear(
+              Offset.zero,
+              Offset(0, chartH),
+              [s.color.withValues(alpha: 0.22), s.color.withValues(alpha: 0)],
+            ),
         );
-        canvas.drawPath(fillPath, Paint()..shader = gradient);
       }
 
-      canvas.drawPath(
-        path,
-        Paint()
-          ..color = s.color
-          ..strokeWidth = 2
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round
-          ..strokeJoin = StrokeJoin.round,
-      );
+      // 3D ribbon: depth layers drawn bottom-to-top
+      if (lineDepth > 0) {
+        for (var d = lineDepth; d >= 1; d--) {
+          final t = d / lineDepth;
+          canvas.drawPath(
+            buildPath(s.data, clipPts, d.toDouble()),
+            Paint()
+              ..color = Color.lerp(s.color, Colors.black, t * 0.55)!
+              ..strokeWidth = 3
+              ..style = PaintingStyle.stroke
+              ..strokeCap = StrokeCap.round
+              ..strokeJoin = StrokeJoin.round,
+          );
+        }
+      }
 
+      // Main ribbon face: vertical gradient (lighter at top → base color)
+      canvas
+        ..drawPath(
+          mainPath,
+          Paint()
+            ..strokeWidth = 3
+            ..style = PaintingStyle.stroke
+            ..strokeCap = StrokeCap.round
+            ..strokeJoin = StrokeJoin.round
+            ..shader = ui.Gradient.linear(
+              Offset.zero,
+              Offset(0, chartH),
+              [Color.lerp(s.color, Colors.white, 0.35)!, s.color],
+            ),
+        )
+
+        // Top-edge highlight gloss
+        ..drawPath(
+          mainPath,
+          Paint()
+            ..color = Colors.white.withValues(alpha: 0.28)
+            ..strokeWidth = 1
+            ..style = PaintingStyle.stroke
+            ..strokeCap = StrokeCap.round,
+        );
+
+      // Dots
       if (showDots) {
         for (var i = 0; i < clipPts; i++) {
           final x = xOf(i);
           final y = yOf(s.data[i]);
           final isTouch = touchIndex == i;
+          final dotR = isTouch ? 5.0 : 3.5;
+
+          // Drop shadow
           canvas.drawCircle(
-            Offset(x, y),
-            isTouch ? 5 : 3.5,
-            Paint()..color = s.color,
+            Offset(x + 1.5, y + 2),
+            dotR,
+            Paint()..color = s.color.withValues(alpha: 0.30),
           );
+
           if (isTouch) {
             canvas.drawCircle(
               Offset(x, y),
               8,
               Paint()
-                ..color = s.color.withValues(alpha: 0.2)
+                ..color = s.color.withValues(alpha: 0.18)
                 ..style = PaintingStyle.fill,
             );
           }
+
+          // Solid dot + specular highlight
+          canvas
+            ..drawCircle(Offset(x, y), dotR, Paint()..color = s.color)
+            ..drawCircle(
+              Offset(x - dotR * 0.30, y - dotR * 0.35),
+              dotR * 0.38,
+              Paint()..color = Colors.white.withValues(alpha: 0.55),
+            );
         }
       }
     }
@@ -300,5 +354,7 @@ class _LineChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_LineChartPainter old) =>
-      old.progress != progress || old.touchIndex != touchIndex;
+      old.progress != progress ||
+      old.touchIndex != touchIndex ||
+      old.lineDepth != lineDepth;
 }

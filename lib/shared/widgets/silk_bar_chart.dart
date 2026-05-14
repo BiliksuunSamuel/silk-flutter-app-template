@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
 
@@ -12,7 +15,7 @@ class SilkBarEntry {
   final Color? color;
 }
 
-/// Animated vertical bar chart. Suitable for monthly returns,
+/// Animated 3D vertical bar chart. Suitable for monthly returns,
 /// transaction volumes, or any discrete-category comparison.
 ///
 /// Usage:
@@ -32,6 +35,7 @@ class SilkBarChart extends StatefulWidget {
     this.height = 160,
     this.barRadius = 4,
     this.showValues = false,
+    this.depth = 5.0,
     super.key,
   });
 
@@ -41,6 +45,9 @@ class SilkBarChart extends StatefulWidget {
 
   /// When true, renders the value above each bar.
   final bool showValues;
+
+  /// Depth of the 3D cuboid effect in pixels. Set to 0 to disable.
+  final double depth;
 
   @override
   State<SilkBarChart> createState() => _SilkBarChartState();
@@ -93,6 +100,7 @@ class _SilkBarChartState extends State<SilkBarChart>
                     barRadius: widget.barRadius,
                     showValue: widget.showValues,
                     chartHeight: widget.height,
+                    depth: widget.depth,
                     defaultColor: tokens.accent,
                   ),
                 ),
@@ -113,6 +121,7 @@ class _Bar extends StatelessWidget {
     required this.barRadius,
     required this.showValue,
     required this.chartHeight,
+    required this.depth,
     required this.defaultColor,
   });
 
@@ -122,6 +131,7 @@ class _Bar extends StatelessWidget {
   final double barRadius;
   final bool showValue;
   final double chartHeight;
+  final double depth;
   final Color defaultColor;
 
   @override
@@ -130,9 +140,11 @@ class _Bar extends StatelessWidget {
     final color = entry.color ?? defaultColor;
     final fraction = maxValue == 0 ? 0.0 : entry.value / maxValue;
     const labelHeight = 20.0;
+    final depthY = depth / 2;
     final barAreaHeight =
         chartHeight - labelHeight - (showValue ? labelHeight : 0);
-    final barHeight = fraction * barAreaHeight * progress;
+    final barHeight =
+        math.max(0, fraction * (barAreaHeight - depthY) * progress);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -148,15 +160,19 @@ class _Bar extends StatelessWidget {
         ],
         Align(
           alignment: Alignment.bottomCenter,
-          child: Container(
-            height: barHeight,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(barRadius),
-              ),
-            ),
-          ),
+          child: barHeight > 0
+              ? SizedBox(
+                  height: barHeight + depthY,
+                  child: CustomPaint(
+                    painter: _Bar3DPainter(
+                      color: color,
+                      barRadius: barRadius,
+                      depth: depth,
+                    ),
+                    child: const SizedBox.expand(),
+                  ),
+                )
+              : const SizedBox.shrink(),
         ),
         SizedBox(height: tokens.spaceXs),
         Text(
@@ -172,4 +188,82 @@ class _Bar extends StatelessWidget {
       ],
     );
   }
+}
+
+class _Bar3DPainter extends CustomPainter {
+  const _Bar3DPainter({
+    required this.color,
+    required this.barRadius,
+    required this.depth,
+  });
+
+  final Color color;
+  final double barRadius;
+  final double depth;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final depthX = depth;
+    final depthY = depth / 2;
+
+    // Front face – runs from (0, depthY) to (w-depthX, h)
+    const double frontLeft = 0;
+    final frontTop = depthY;
+    final frontRight = w - depthX;
+    final frontBottom = h;
+
+    canvas
+      ..drawRRect(
+        RRect.fromLTRBAndCorners(
+          frontLeft,
+          frontTop,
+          frontRight,
+          frontBottom,
+          topLeft: Radius.circular(barRadius),
+        ),
+        Paint()
+          ..shader = ui.Gradient.linear(
+            Offset(0, frontTop),
+            Offset(0, frontBottom),
+            [Color.lerp(color, Colors.white, 0.30)!, color],
+          ),
+      )
+
+      // Top face – parallelogram connecting front-top edge to back-top edge
+      ..drawPath(
+        Path()
+          ..moveTo(frontLeft, frontTop)
+          ..lineTo(depthX, 0)
+          ..lineTo(w, 0)
+          ..lineTo(frontRight, frontTop)
+          ..close(),
+        Paint()..color = Color.lerp(color, Colors.white, 0.45)!,
+      )
+
+      // Right side face – darker quadrilateral
+      ..drawPath(
+        Path()
+          ..moveTo(frontRight, frontTop)
+          ..lineTo(w, 0)
+          ..lineTo(w, h - depthY)
+          ..lineTo(frontRight, frontBottom)
+          ..close(),
+        Paint()..color = Color.lerp(color, Colors.black, 0.30)!,
+      )
+
+      // Gloss highlight along the front-face top edge
+      ..drawLine(
+        Offset(frontLeft + barRadius, frontTop),
+        Offset(frontRight, frontTop),
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.35)
+          ..strokeWidth = 1,
+      );
+  }
+
+  @override
+  bool shouldRepaint(_Bar3DPainter old) =>
+      old.color != color || old.depth != depth || old.barRadius != barRadius;
 }

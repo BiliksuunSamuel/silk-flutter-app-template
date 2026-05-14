@@ -54,6 +54,7 @@ import 'package:silk/shared/widgets/silk_keypad.dart';
 import 'package:silk/shared/widgets/silk_line_chart.dart';
 import 'package:silk/shared/widgets/silk_list_tile.dart';
 import 'package:silk/shared/widgets/silk_loading_overlay.dart';
+import 'package:silk/shared/widgets/silk_map_view.dart';
 import 'package:silk/shared/widgets/silk_markdown_text.dart';
 import 'package:silk/shared/widgets/silk_month_picker.dart';
 import 'package:silk/shared/widgets/silk_multi_value_select_input.dart';
@@ -156,6 +157,7 @@ class _HomeStubScreenState extends ConsumerState<HomeStubScreen> {
   int? _pieSelectedIndex;
   String? _uploadFileName;
   final _floatingInputCtrl = TextEditingController();
+  String? _mapCountry;
 
   static final _countries = [
     const SilkSelectItem(value: 'ng', label: 'Nigeria'),
@@ -3275,6 +3277,65 @@ class _HomeStubScreenState extends ConsumerState<HomeStubScreen> {
               ),
             ),
 
+            // ── Map View ───────────────────────────────────────────────────
+            _Section(
+              title: 'Map View',
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spaceLg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Country selector chips
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          for (final entry in const {
+                            null: 'World',
+                            'GH': 'Ghana',
+                            'NG': 'Nigeria',
+                            'ZA': 'South Africa',
+                            'KE': 'Kenya',
+                            'US': 'USA',
+                            'GB': 'UK',
+                          }.entries) ...[
+                            ChoiceChip(
+                              label: Text(entry.value),
+                              selected: _mapCountry == entry.key,
+                              onSelected: (_) =>
+                                  setState(() => _mapCountry = entry.key),
+                            ),
+                            SizedBox(width: tokens.spaceXs),
+                          ],
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: tokens.spaceMd),
+                    // Inline preview
+                    SilkMapView(
+                      countryCode: _mapCountry,
+                      height: 220,
+                    ),
+                    SizedBox(height: tokens.spaceSm),
+                    // Full-screen button
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.fullscreen, size: 18),
+                      label: const Text('Open full screen'),
+                      onPressed: () => showModalBottomSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        useSafeArea: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (ctx) => _MapFullScreenModal(
+                          countryCode: _mapCountry,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
             // ── Markdown Text ──────────────────────────────────────────────
             _Section(
               title: 'Markdown Text',
@@ -3498,6 +3559,97 @@ class _LegendRow extends StatelessWidget {
               .copyWith(fontWeight: FontWeight.w600),
         ),
       ],
+    );
+  }
+}
+
+class _MapFullScreenModal extends StatefulWidget {
+  const _MapFullScreenModal({this.countryCode});
+  final String? countryCode;
+
+  @override
+  State<_MapFullScreenModal> createState() => _MapFullScreenModalState();
+}
+
+class _MapFullScreenModalState extends State<_MapFullScreenModal> {
+  late String? _country;
+
+  static const _countries = {
+    null: 'World',
+    'GH': 'Ghana',
+    'NG': 'Nigeria',
+    'ZA': 'South Africa',
+    'KE': 'Kenya',
+    'US': 'USA',
+    'GB': 'UK',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _country = widget.countryCode;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    return Scaffold(
+      backgroundColor: tokens.surface,
+      appBar: AppBar(
+        backgroundColor: tokens.surface,
+        foregroundColor: tokens.onSurface,
+        elevation: 0,
+        title: Text(
+          _countries[_country] ?? 'Map',
+          style: tokens.titleStyle,
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Country chips
+          SizedBox(
+            height: 44,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: tokens.spaceMd),
+              children: [
+                for (final entry in _countries.entries) ...[
+                  ChoiceChip(
+                    label: Text(entry.value),
+                    selected: _country == entry.key,
+                    onSelected: (_) =>
+                        setState(() => _country = entry.key),
+                  ),
+                  SizedBox(width: tokens.spaceXs),
+                ],
+              ],
+            ),
+          ),
+          SizedBox(height: tokens.spaceXs),
+          // Map fills all remaining space
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                tokens.spaceMd,
+                0,
+                tokens.spaceMd,
+                tokens.spaceMd,
+              ),
+              child: SilkMapView(
+                countryCode: _country,
+                height: null,
+                borderRadius: tokens.radiusMd,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
