@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:silk/core/motion/motion_tokens.dart';
+import 'package:silk/core/motion/scroll_physics.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
 
 class SilkCarousel extends StatefulWidget {
@@ -33,32 +36,48 @@ class SilkCarousel extends StatefulWidget {
 
 class _SilkCarouselState extends State<SilkCarousel> {
   late final PageController _ctrl;
+  Timer? _autoPlayTimer;
   int _current = 0;
+  int _autoStep = 1; // auto-play direction for ping-pong
 
   @override
   void initState() {
     super.initState();
     _ctrl = PageController(viewportFraction: widget.viewportFraction);
-    if (widget.autoPlay) _scheduleAutoPlay();
+    if (widget.autoPlay && widget.children.length > 1) {
+      // A cancellable periodic timer (cancelled in dispose) — avoids leaking a
+      // pending timer when the widget is torn down.
+      _autoPlayTimer = Timer.periodic(widget.autoPlayInterval, _advance);
+    }
   }
 
   @override
   void dispose() {
+    _autoPlayTimer?.cancel();
     _ctrl.dispose();
     super.dispose();
   }
 
-  Future<void> _scheduleAutoPlay() async {
-    while (mounted) {
-      await Future<void>.delayed(widget.autoPlayInterval);
-      if (!mounted) break;
-      final next = (_current + 1) % widget.children.length;
-      await _ctrl.animateToPage(
-        next,
-        duration: MotionTokens.emphasized,
-        curve: MotionTokens.emphasizedDecel,
-      );
+  void _advance(Timer _) {
+    if (!mounted || !_ctrl.hasClients) return;
+    final count = widget.children.length;
+    if (count < 2) return;
+
+    // Ping-pong (0→1→2→1→0…) so we never sweep all the way back across the
+    // slides on wrap — each tick moves exactly one page.
+    var next = _current + _autoStep;
+    if (next >= count) {
+      _autoStep = -1;
+      next = _current - 1;
+    } else if (next < 0) {
+      _autoStep = 1;
+      next = _current + 1;
     }
+    _ctrl.animateToPage(
+      next,
+      duration: MotionTokens.emphasized,
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -72,6 +91,8 @@ class _SilkCarouselState extends State<SilkCarousel> {
           height: widget.height,
           child: PageView.builder(
             controller: _ctrl,
+            // Firm page-snap: no overscroll bounce, no settle overshoot.
+            physics: const FirmPageScrollPhysics(parent: ClampingScrollPhysics()),
             itemCount: widget.children.length,
             onPageChanged: (i) {
               setState(() => _current = i);
@@ -86,7 +107,7 @@ class _SilkCarouselState extends State<SilkCarousel> {
           ),
         ),
         if (widget.showIndicator && widget.children.length > 1) ...[
-          SizedBox(height: tokens.spaceMd),
+          SizedBox(height: tokens.spaceXs),
           _DotIndicator(
             count: widget.children.length,
             current: _current,

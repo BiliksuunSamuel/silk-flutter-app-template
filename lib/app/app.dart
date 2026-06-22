@@ -27,6 +27,17 @@ class SilkApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Silk',
       scrollBehavior: const SilkScrollBehavior(),
+      // App-wide: tapping anywhere outside a focused input dismisses the
+      // keyboard. Translucent so children (buttons, list rows, fields) still
+      // receive their taps; this only fires for otherwise-unclaimed taps.
+      builder: (context, child) => GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          final focus = FocusManager.instance.primaryFocus;
+          if (focus != null && focus.hasFocus) focus.unfocus();
+        },
+        child: child,
+      ),
       theme: ThemeBuilder.buildTheme(lightTokens),
       darkTheme: ThemeBuilder.buildTheme(darkTokens),
       themeMode: themeMode,
