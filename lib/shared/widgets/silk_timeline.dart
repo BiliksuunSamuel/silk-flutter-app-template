@@ -153,7 +153,7 @@ class _Node extends StatelessWidget {
           child: Icon(
             item.icon ?? Icons.check_rounded,
             size: 13,
-            color: Colors.white,
+            color: tokens.onAccent,
           ),
         ),
       SilkTimelineStatus.active => _ActiveNode(icon: item.icon),
@@ -225,7 +225,7 @@ class _ActiveNodeState extends State<_ActiveNode>
         child: Icon(
           widget.icon ?? Icons.radio_button_checked_rounded,
           size: 12,
-          color: Colors.white,
+          color: tokens.onAccent,
         ),
       ),
     );

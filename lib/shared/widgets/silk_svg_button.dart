@@ -57,7 +57,7 @@ class _SilkSvgButtonState extends State<SilkSvgButton> {
     };
 
     final (bg, fg, border) = switch (widget.variant) {
-      SilkIconButtonVariant.primary => (tokens.accent, Colors.white, null),
+      SilkIconButtonVariant.primary => (tokens.accent, tokens.onAccent, null),
       SilkIconButtonVariant.ghost => (
           Colors.transparent,
           tokens.onSurface,

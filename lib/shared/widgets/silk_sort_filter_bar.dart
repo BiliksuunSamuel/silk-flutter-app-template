@@ -88,7 +88,7 @@ class SilkSortFilterBar<T> extends StatelessWidget {
                       chip.label,
                       style: tokens.captionStyle.copyWith(
                         color: isActive
-                            ? Colors.white
+                            ? tokens.onAccent
                             : tokens.onSurface,
                         fontWeight: isActive
                             ? FontWeight.w600

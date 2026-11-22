@@ -234,7 +234,7 @@ class _MonthSheetState extends State<_MonthSheet> {
                     _months[i].substring(0, 3),
                     style: tokens.bodySmStyle.copyWith(
                       color: isSelected
-                          ? Colors.white
+                          ? tokens.onAccent
                           : selectable
                               ? tokens.onSurface
                               : tokens.onSurfaceMuted,

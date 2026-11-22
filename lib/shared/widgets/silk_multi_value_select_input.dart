@@ -364,7 +364,7 @@ class _MultiSelectOptionState<T> extends State<_MultiSelectOption<T>> {
                   ),
                 ),
                 child: widget.isSelected
-                    ? const Icon(Icons.check, size: 14, color: Colors.white)
+                    ? Icon(Icons.check, size: 14, color: tokens.onAccent)
                     : null,
               ),
               SizedBox(width: tokens.spaceMd),

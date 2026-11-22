@@ -22,20 +22,18 @@ class SilkTag extends StatelessWidget {
     final tokens = context.tokens;
 
     final (fg, bg) = switch (variant) {
-      SilkTagVariant.accent   => (tokens.accent,                    tokens.accent.withValues(alpha: 0.12)),
-      SilkTagVariant.success  => (tokens.success,                   tokens.success.withValues(alpha: 0.12)),
-      SilkTagVariant.warning  => (const Color(0xFFF59E0B),          const Color(0xFFFEF3C7)),
-      SilkTagVariant.danger   => (tokens.danger,                    tokens.danger.withValues(alpha: 0.12)),
-      SilkTagVariant.muted    => (tokens.onSurfaceMuted,            tokens.surfaceMuted),
+      SilkTagVariant.accent => (tokens.accentInk, tokens.accentTint),
+      SilkTagVariant.success => (tokens.success, tokens.successTint),
+      SilkTagVariant.warning => (tokens.warning, tokens.warningTint),
+      SilkTagVariant.danger => (tokens.danger, tokens.dangerTint),
+      SilkTagVariant.muted => (tokens.onSurfaceMuted, tokens.surfaceMuted),
     };
 
     final leadingIcon = icon;
 
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: tokens.spaceSm,
-        vertical: 3,
-      ),
+      // 16 line-height + 2×4 = 24 high pill.
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(tokens.radiusPill),
@@ -49,7 +47,7 @@ class SilkTag extends StatelessWidget {
           ],
           Text(
             label,
-            style: tokens.overlineStyle.copyWith(
+            style: tokens.captionStyle.copyWith(
               color: fg,
               fontWeight: FontWeight.w600,
             ),

@@ -149,7 +149,7 @@ class _SilkTabItem<T> extends StatelessWidget {
                     child: Text(
                       '$badge',
                       style: tokens.captionStyle.copyWith(
-                        color: isSelected ? Colors.white : tokens.onSurfaceMuted,
+                        color: isSelected ? tokens.onAccent : tokens.onSurfaceMuted,
                         fontWeight: FontWeight.w600,
                         fontSize: 10,
                       ),

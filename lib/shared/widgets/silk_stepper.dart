@@ -508,15 +508,15 @@ class _NodeDisc extends StatelessWidget {
       nodeContent = Icon(
         icon ?? Icons.check_rounded,
         size: nodeSize * 0.55,
-        color: Colors.white,
+        color: tokens.onAccent,
       );
     } else if (isActive) {
       nodeContent = icon != null
-          ? Icon(icon, size: nodeSize * 0.55, color: Colors.white)
+          ? Icon(icon, size: nodeSize * 0.55, color: tokens.onAccent)
           : Text(
               '${index + 1}',
               style: tokens.labelStyle.copyWith(
-                color: Colors.white,
+                color: tokens.onAccent,
                 fontWeight: FontWeight.w700,
               ),
             );

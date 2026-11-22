@@ -33,7 +33,7 @@ class SilkIconButton extends StatelessWidget {
     };
 
     final (bg, fg, border) = switch (variant) {
-      SilkIconButtonVariant.primary => (tokens.accent, Colors.white, null),
+      SilkIconButtonVariant.primary => (tokens.accent, tokens.onAccent, null),
       SilkIconButtonVariant.ghost => (
           Colors.transparent,
           tokens.onSurface,

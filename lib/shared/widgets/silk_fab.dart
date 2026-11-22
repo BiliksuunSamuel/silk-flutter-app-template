@@ -32,13 +32,13 @@ class SilkFAB extends StatelessWidget {
     final tokens = context.tokens;
 
     final (dimension, iconSize, elevation) = switch (size) {
-      SilkFABSize.sm => (40.0, 18.0, tokens.shadowSm),
-      SilkFABSize.md => (56.0, 24.0, tokens.shadowMd),
-      SilkFABSize.lg => (68.0, 28.0, tokens.shadowMd),
+      SilkFABSize.sm => (40.0, 18.0, tokens.shadowFloating),
+      SilkFABSize.md => (56.0, 24.0, tokens.shadowFloating),
+      SilkFABSize.lg => (68.0, 28.0, tokens.shadowFloating),
     };
 
     final (bg, fg) = switch (variant) {
-      SilkFABVariant.primary => (tokens.accent, Colors.white),
+      SilkFABVariant.primary => (tokens.accent, tokens.onAccent),
       SilkFABVariant.surface => (tokens.surface, tokens.onSurface),
     };
 

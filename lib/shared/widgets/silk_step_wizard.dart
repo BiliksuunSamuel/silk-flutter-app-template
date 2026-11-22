@@ -150,8 +150,8 @@ class _SilkStepWizardState extends State<SilkStepWizard> {
                 ),
                 child: Text(
                   isLast ? widget.finishLabel : widget.nextLabel,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: tokens.onAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

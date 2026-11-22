@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:silk/core/theme/app_typography.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
 
-enum SilkBadgeVariant { accent, success, danger, muted }
+enum SilkBadgeVariant { accent, success, warning, danger, muted }
 
 class SilkBadge extends StatelessWidget {
   const SilkBadge({
@@ -10,10 +11,8 @@ class SilkBadge extends StatelessWidget {
     super.key,
   });
 
-  const SilkBadge.count({
-    required int count,
-    Key? key,
-  }) : this(label: '$count', key: key);
+  const SilkBadge.count({required int count, Key? key})
+    : this(label: '$count', key: key);
 
   final String label;
   final SilkBadgeVariant variant;
@@ -22,16 +21,13 @@ class SilkBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.tokens;
 
-    final bg = switch (variant) {
-      SilkBadgeVariant.accent => tokens.accent,
-      SilkBadgeVariant.success => tokens.success,
-      SilkBadgeVariant.danger => tokens.danger,
-      SilkBadgeVariant.muted => tokens.surfaceMuted,
-    };
-
-    final fg = switch (variant) {
-      SilkBadgeVariant.muted => tokens.onSurfaceMuted,
-      _ => Colors.white,
+    // `accent` is the solid unread/count pill; the rest are tinted status pills.
+    final (bg, fg) = switch (variant) {
+      SilkBadgeVariant.accent => (tokens.accent, tokens.onAccent),
+      SilkBadgeVariant.success => (tokens.successTint, tokens.success),
+      SilkBadgeVariant.warning => (tokens.warningTint, tokens.warning),
+      SilkBadgeVariant.danger => (tokens.dangerTint, tokens.danger),
+      SilkBadgeVariant.muted => (tokens.surfaceMuted, tokens.onSurfaceMuted),
     };
 
     return Container(
@@ -45,10 +41,8 @@ class SilkBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: tokens.captionStyle.copyWith(
-          color: fg,
-          fontWeight: FontWeight.w600,
-          fontSize: 11,
+        style: AppTypography.tabular(
+          tokens.captionStyle.copyWith(color: fg, fontWeight: FontWeight.w700),
         ),
       ),
     );

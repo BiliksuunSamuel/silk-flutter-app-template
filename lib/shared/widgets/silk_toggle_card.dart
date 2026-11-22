@@ -114,10 +114,10 @@ class SilkToggleCard extends StatelessWidget {
                   ),
                 ),
                 child: selected
-                    ? const Icon(
+                    ? Icon(
                         Icons.check_rounded,
                         size: 12,
-                        color: Colors.white,
+                        color: tokens.onAccent,
                       )
                     : null,
               ),

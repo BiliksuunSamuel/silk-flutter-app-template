@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
+import 'package:silk/shared/widgets/pressable_scale.dart';
 
+/// Shadow recipe for a card. Solid UI cards are flat — [none] is the default.
+/// Only use a shadow when the card genuinely floats over content.
 enum SilkCardElevation { none, sm, md, lg }
 
+/// Flat card: [surface] fill, radius 20, soft hairline border, no shadow.
+/// Tappable cards use press-scale (no ripple).
 class SilkCard extends StatelessWidget {
   const SilkCard({
     required this.child,
@@ -10,7 +15,7 @@ class SilkCard extends StatelessWidget {
     this.onTap,
     this.color,
     this.borderRadius,
-    this.hasBorder = false,
+    this.hasBorder = true,
     this.elevation = SilkCardElevation.none,
     super.key,
   });
@@ -20,50 +25,41 @@ class SilkCard extends StatelessWidget {
   final VoidCallback? onTap;
   final Color? color;
   final double? borderRadius;
+
+  /// Soft hairline border (default). Set false for a borderless card on a
+  /// background that already separates it.
   final bool hasBorder;
   final SilkCardElevation elevation;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
-    final radius = borderRadius ?? tokens.radiusMd;
-    final bg = color ?? tokens.surface;
+    final radius = BorderRadius.circular(borderRadius ?? tokens.radiusLg);
 
     final shadow = switch (elevation) {
-      SilkCardElevation.none => <BoxShadow>[],
-      SilkCardElevation.sm   => tokens.shadowSm,
-      SilkCardElevation.md   => tokens.shadowMd,
-      SilkCardElevation.lg   => tokens.shadowLg,
+      SilkCardElevation.none => const <BoxShadow>[],
+      SilkCardElevation.sm => tokens.shadowSm,
+      SilkCardElevation.md => tokens.shadowMd,
+      SilkCardElevation.lg => tokens.shadowLg,
     };
 
-    final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(radius),
-    );
-
-    Widget card = Ink(
+    final card = DecoratedBox(
       decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(radius),
-        border: hasBorder ? Border.all(color: tokens.divider) : null,
+        color: color ?? tokens.surface,
+        borderRadius: radius,
+        border: hasBorder ? Border.all(color: tokens.hairlineSoft) : null,
         boxShadow: shadow,
       ),
-      child: Padding(
-        padding: padding ?? EdgeInsets.all(tokens.spaceMd),
-        child: child,
+      child: ClipRRect(
+        borderRadius: radius,
+        child: Padding(
+          padding: padding ?? EdgeInsets.all(tokens.spaceMd),
+          child: child,
+        ),
       ),
     );
 
-    if (onTap != null) {
-      card = InkWell(
-        onTap: onTap,
-        customBorder: shape,
-        child: card,
-      );
-    }
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: card,
-    );
+    if (onTap == null) return card;
+    return PressableScale(onTap: onTap, scale: 0.98, child: card);
   }
 }

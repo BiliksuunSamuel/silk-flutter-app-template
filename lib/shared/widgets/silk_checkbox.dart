@@ -56,7 +56,7 @@ class _SilkCheckboxState extends State<SilkCheckbox> {
       child: AnimatedOpacity(
         opacity: widget.value ? 1.0 : 0.0,
         duration: MotionTokens.fast,
-        child: const Icon(Icons.check, size: 14, color: Colors.white),
+        child: Icon(Icons.check, size: 14, color: tokens.onAccent),
       ),
     );
 

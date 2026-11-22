@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
+import 'package:silk/shared/widgets/frosted_bar.dart';
 import 'package:silk/shared/widgets/silk_back_button.dart';
 
 class SilkAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -21,21 +22,28 @@ class SilkAppBar extends StatelessWidget implements PreferredSizeWidget {
   final PreferredSizeWidget? bottom;
 
   @override
-  Size get preferredSize => Size.fromHeight(
-        kToolbarHeight + (bottom?.preferredSize.height ?? 0),
-      );
+  Size get preferredSize =>
+      Size.fromHeight(kToolbarHeight + (bottom?.preferredSize.height ?? 0));
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
     final canPop = Navigator.of(context).canPop();
 
+    // Solid UI: transparent over the canvas (or frosted when requested); a
+    // hairline appears only once content scrolls under the bar.
     return AppBar(
-      backgroundColor: tokens.surface,
+      backgroundColor: blurBackground ? Colors.transparent : tokens.canvas,
+      flexibleSpace: blurBackground
+          ? const FrostedBar(showHairline: false, child: SizedBox.expand())
+          : null,
       surfaceTintColor: Colors.transparent,
+      shadowColor: tokens.hairlineStrong,
       elevation: 0,
+      scrolledUnderElevation: 0.5,
       centerTitle: true,
-      leading: leading ??
+      leading:
+          leading ??
           (showBackButton && canPop
               ? Padding(
                   padding: EdgeInsets.only(left: tokens.spaceSm),
@@ -43,12 +51,9 @@ class SilkAppBar extends StatelessWidget implements PreferredSizeWidget {
                 )
               : null),
       automaticallyImplyLeading: false,
-      title: Text(title, style: tokens.titleStyle),
+      title: Text(title, style: tokens.titleSmStyle),
       actions: actions != null
-          ? [
-              ...actions!,
-              SizedBox(width: tokens.spaceSm),
-            ]
+          ? [...actions!, SizedBox(width: tokens.spaceSm)]
           : null,
       bottom: bottom,
     );

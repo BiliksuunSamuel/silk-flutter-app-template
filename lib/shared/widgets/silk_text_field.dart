@@ -19,6 +19,7 @@ class SilkTextField extends StatefulWidget {
     this.autofocus = false,
     this.enabled = true,
     this.maxLength,
+    this.label,
     super.key,
   });
 
@@ -41,6 +42,9 @@ class SilkTextField extends StatefulWidget {
   final bool autofocus;
   final bool enabled;
   final int? maxLength;
+
+  /// Label shown above the field (footnote, 600). No floating Material label.
+  final String? label;
 
   @override
   State<SilkTextField> createState() => _SilkTextFieldState();
@@ -85,23 +89,40 @@ class _SilkTextFieldState extends State<SilkTextField> {
     final borderColor = hasError
         ? tokens.danger
         : _hasFocus
-            ? tokens.accent
-            : tokens.divider;
+        ? tokens.accentInk
+        : tokens.hairlineStrong;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (widget.label != null) ...[
+          Text(
+            widget.label!,
+            style: tokens.labelStyle.copyWith(
+              color: tokens.body,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 6),
+        ],
         AnimatedContainer(
           duration: MotionTokens.fast,
           curve: MotionTokens.standardCurve,
+          constraints: const BoxConstraints(minHeight: 48),
           decoration: BoxDecoration(
-            color: widget.enabled ? tokens.surfaceMuted : tokens.divider,
+            color: widget.enabled ? tokens.surface : tokens.surfaceMuted,
             borderRadius: BorderRadius.circular(tokens.radiusMd),
-            border: Border.all(
-              color: borderColor,
-              width: _hasFocus ? 1.5 : 1.0,
-            ),
+            border: Border.all(color: borderColor),
+            // 4pt focus ring in accent @ 18%.
+            boxShadow: _hasFocus && !hasError
+                ? [
+                    BoxShadow(
+                      color: tokens.accent.withValues(alpha: 0.18),
+                      spreadRadius: 4,
+                    ),
+                  ]
+                : null,
           ),
           child: TextField(
             controller: widget.controller,
@@ -118,23 +139,29 @@ class _SilkTextFieldState extends State<SilkTextField> {
             cursorColor: tokens.accent,
             decoration: InputDecoration(
               hintText: widget.hint,
-              hintStyle: tokens.bodyStyle.copyWith(color: tokens.onSurfaceMuted),
+              hintStyle: tokens.bodyStyle.copyWith(color: tokens.subtle),
               prefixIcon: widget.prefixIcon != null
                   ? IconTheme(
-                      data: IconThemeData(color: tokens.onSurfaceMuted, size: 20),
+                      data: IconThemeData(
+                        color: tokens.onSurfaceMuted,
+                        size: 20,
+                      ),
                       child: widget.prefixIcon!,
                     )
                   : null,
               suffixIcon: widget.suffixIcon != null
                   ? IconTheme(
-                      data: IconThemeData(color: tokens.onSurfaceMuted, size: 20),
+                      data: IconThemeData(
+                        color: tokens.onSurfaceMuted,
+                        size: 20,
+                      ),
                       child: widget.suffixIcon!,
                     )
                   : null,
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: tokens.spaceMd,
-                vertical: tokens.spaceMd,
+                vertical: 12,
               ),
               counterText: '',
             ),
@@ -144,7 +171,7 @@ class _SilkTextFieldState extends State<SilkTextField> {
           SizedBox(height: tokens.spaceXs),
           Text(
             displayError,
-            style: tokens.captionStyle.copyWith(color: tokens.danger),
+            style: tokens.labelStyle.copyWith(color: tokens.danger),
           ),
         ],
       ],

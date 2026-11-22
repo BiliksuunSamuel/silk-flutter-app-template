@@ -266,7 +266,7 @@ class _DayCell extends StatelessWidget {
 
     if (isSelected) {
       bg = tokens.accent;
-      textColor = Colors.white;
+      textColor = tokens.onAccent;
       border = null;
     } else if (isToday) {
       bg = Colors.transparent;

@@ -109,8 +109,8 @@ class _RadioTileState<T> extends State<_RadioTile<T>> {
                         child: Container(
                           width: 8,
                           height: 8,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: tokens.onAccent,
                             shape: BoxShape.circle,
                           ),
                         ),

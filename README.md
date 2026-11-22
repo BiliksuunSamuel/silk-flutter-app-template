@@ -123,33 +123,53 @@ lib/
 
 ## Design system
 
-### Tokens
+### Tokens — Solid UI
 
-Every visual value — color, spacing, radius, shadow, typography — lives in `AppTokens`, a `ThemeExtension`. Access it via `context.tokens`.
+The template follows the **Solid UI** system: calm flat surfaces, hairlines instead of borders-and-shadows everywhere, one scarce accent, and shadows only on things that genuinely float.
+
+Every visual value lives in `AppTokens`, a `ThemeExtension`. Access it via `context.tokens`.
 
 ```dart
-Container(color: context.tokens.accent)
+Container(color: context.tokens.surface)
 SizedBox(height: context.tokens.spaceMd)      // 16
 Text('Title', style: context.tokens.titleStyle)
 ```
 
-Light and dark values are defined in `light_tokens.dart` / `dark_tokens.dart`. To change a color or add a token: update `AppTokens` in `tokens.dart`, then update both token files.
+| Slot | Use |
+|---|---|
+| `canvas` / `surface` / `surfaceMuted` | Scaffold bg / cards, sheets, inputs / sunken fills (segment track, skeletons) |
+| `onSurface` / `body` / `onSurfaceMuted` / `subtle` | Ink / body text / secondary text / timestamps (never actionable) |
+| `hairline` / `hairlineSoft` / `hairlineStrong` | Dividers / card borders / input & secondary-button borders |
+| `accent` / `onAccent` / `accentInk` / `accentTint` | Brand fill / text on accent / accent text on surface / selected highlight |
+| `success` `warning` `danger` (+ `…Tint`) | Status pills and text |
+
+**The accent is one swappable slot.** Change `kLightAccent` / `kDarkAccent` in `light_tokens.dart` / `dark_tokens.dart`; `onAccent` (white or black, ≥ 4.5:1) and `accentInk` (≥ 4.5:1 as text) are derived by `ColorContrast`, so any brand colour stays accessible. Always use `tokens.onAccent`, never `Colors.white`, for content on the accent.
+
+**Elevation is earned.** Rows, cards, bubbles and inputs never get a shadow. Only floating surfaces do: `shadowSegment` (active segment), `shadowFloating` (sheets, dialogs, menus, toasts, FAB) and `shadowPrimaryButton`.
+
+**Radii:** `radiusMd` 12 controls · `radiusLg` 20 cards · `radiusMedia` 16 · `radiusSegment` 9 · `radiusSheet` 28 · `radiusPill`. **Spacing:** 4 · 8 · 16 · 24 · 32 · 56.
+
+Material 3 is configured to match (`theme_builder.dart`): no surface tint, no ink ripples (use `PressableScale`), 0.5px hairline dividers, Cupertino page transitions, frosted bars via `FrostedBar`.
+
+Light and dark values are defined in `light_tokens.dart` / `dark_tokens.dart`. To add a token: update `AppTokens` in `tokens.dart`, then update both token files.
 
 ### Typography
 
-Ten-step Inter type scale. All sizes responsive via `SilkSizer`.
+Solid type scale on Inter. All sizes responsive via `SilkSizer`. Wrap a style in `AppTypography.tabular(...)` for money, times and counts.
 
-| Token | Size | Weight | Use |
+| Token | Size / line | Weight | Use |
 |---|---|---|---|
-| `displayStyle` | 32 | 700 | Hero text |
-| `headlineStyle` | 24 | 600 | Page titles |
-| `titleStyle` | 20 | 600 | Section headings |
-| `titleSmStyle` | 17 | 600 | Nav titles, list items |
-| `bodyStyle` | 16 | 400 | Standard body |
-| `bodySmStyle` | 14 | 400 | Dense / secondary body |
-| `labelStyle` | 13 | 500 | Chips, badges, buttons |
-| `captionStyle` | 12 | 400 | Helper text, timestamps |
-| `overlineStyle` | 11 | 600 | Section dividers |
+| `displayStyle` | 34 / 40 | 700 | Large screen titles |
+| `headlineStyle` | 28 / 34 | 700 | Sheet titles, empty states |
+| `titleStyle` | 22 / 28 | 700 | Section titles |
+| `title3Style` | 20 / 25 | 600 | Card titles, amounts |
+| `titleSmStyle` | 17 / 22 | 600 | Row titles, buttons, nav titles |
+| `bodyStyle` | 17 / 24 | 400 | Messages, paragraphs |
+| `calloutStyle` | 16 / 21 | 400 | Secondary paragraphs |
+| `bodySmStyle` | 15 / 20 | 400 | Row subtitles, dense body |
+| `labelStyle` | 13 / 18 | 500 | Metadata, helper text, chips |
+| `captionStyle` | 12 / 16 | 500 | Timestamps, pill labels |
+| `overlineStyle` | 11 / 13 | 600 | Rare: grouped-list section headers |
 | `monoStyle` | 14 | 400 mono | Code, OTP, numeric fields |
 
 To change the font, update the `GoogleFonts.*` call in `app_typography.dart`.

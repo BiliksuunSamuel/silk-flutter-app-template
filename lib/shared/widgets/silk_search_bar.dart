@@ -52,7 +52,8 @@ class _SilkSearchBarState extends State<SilkSearchBar> {
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
-    final radius = BorderRadius.circular(tokens.radiusPill);
+    // Inset 36pt field, radius 10, sunken fill.
+    final radius = BorderRadius.circular(10);
     final noBorder = OutlineInputBorder(
       borderRadius: radius,
       borderSide: BorderSide.none,
@@ -63,32 +64,34 @@ class _SilkSearchBarState extends State<SilkSearchBar> {
       autofocus: widget.autofocus,
       onChanged: widget.onChanged,
       onSubmitted: widget.onSubmitted,
-      style: tokens.bodyStyle.copyWith(fontSize: 15),
+      style: tokens.bodySmStyle.copyWith(color: tokens.onSurface),
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
         hintText: widget.placeholder,
-        hintStyle: tokens.bodyStyle.copyWith(
-          fontSize: 15,
-          color: tokens.onSurfaceMuted,
-        ),
+        hintStyle: tokens.bodySmStyle.copyWith(color: tokens.onSurfaceMuted),
         isDense: true,
         filled: true,
         fillColor: tokens.surfaceMuted,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 10,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         prefixIcon: Icon(Icons.search, color: tokens.onSurfaceMuted, size: 18),
-        prefixIconConstraints:
-            const BoxConstraints(minWidth: 38, minHeight: 38),
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 38,
+          minHeight: 38,
+        ),
         suffixIcon: _hasText
             ? GestureDetector(
                 onTap: _clear,
-                child: Icon(Icons.cancel, color: tokens.onSurfaceMuted, size: 16),
+                child: Icon(
+                  Icons.cancel,
+                  color: tokens.onSurfaceMuted,
+                  size: 16,
+                ),
               )
             : null,
-        suffixIconConstraints:
-            const BoxConstraints(minWidth: 34, minHeight: 34),
+        suffixIconConstraints: const BoxConstraints(
+          minWidth: 34,
+          minHeight: 34,
+        ),
         border: noBorder,
         enabledBorder: noBorder,
         focusedBorder: noBorder,

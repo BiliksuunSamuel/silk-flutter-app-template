@@ -484,7 +484,7 @@ class _DayCell extends StatelessWidget {
                       child: Text(
                         '${day.day}',
                         style: tokens.captionStyle.copyWith(
-                          color: Colors.white,
+                          color: tokens.onAccent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

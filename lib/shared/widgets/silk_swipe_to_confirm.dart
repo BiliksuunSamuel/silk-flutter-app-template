@@ -170,7 +170,7 @@ class _SilkSwipeToConfirmState extends State<SilkSwipeToConfirm>
                       _confirmed
                           ? Icons.check_rounded
                           : widget.thumbIcon,
-                      color: Colors.white,
+                      color: tokens.onAccent,
                       size: 22,
                     ),
                   ),

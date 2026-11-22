@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:silk/core/motion/haptics.dart';
 import 'package:silk/core/motion/motion_tokens.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
 
@@ -28,18 +29,17 @@ class _SilkChipState extends State<SilkChip> {
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
-    final bg = widget.selected
-        ? tokens.accent.withValues(alpha: 0.12)
-        : tokens.surfaceMuted;
-    final fg = widget.selected ? tokens.accent : tokens.onSurface;
-    final borderColor =
-        widget.selected ? tokens.accent.withValues(alpha: 0.4) : tokens.divider;
+    final bg = widget.selected ? tokens.accentTint : tokens.surfaceMuted;
+    final fg = widget.selected ? tokens.accentInk : tokens.onSurface;
 
     return GestureDetector(
-      onTapDown: widget.onTap != null ? (_) => setState(() => _pressed = true) : null,
+      onTapDown: widget.onTap != null
+          ? (_) => setState(() => _pressed = true)
+          : null,
       onTapUp: widget.onTap != null
           ? (_) {
               setState(() => _pressed = false);
+              Haptics.selection();
               widget.onTap?.call();
             }
           : null,
@@ -50,17 +50,17 @@ class _SilkChipState extends State<SilkChip> {
         child: AnimatedContainer(
           duration: MotionTokens.fast,
           curve: MotionTokens.standardCurve,
+          constraints: const BoxConstraints(minHeight: 32),
           padding: EdgeInsets.symmetric(
             horizontal: tokens.spaceSm + tokens.spaceXs,
-            vertical: tokens.spaceXs + 2,
           ),
           decoration: BoxDecoration(
             color: bg,
-            borderRadius: BorderRadius.circular(tokens.radiusPill),
-            border: Border.all(color: borderColor),
+            borderRadius: BorderRadius.circular(tokens.radiusSegment),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.leadingIcon != null) ...[
                 Icon(widget.leadingIcon, size: 14, color: fg),
@@ -70,8 +70,9 @@ class _SilkChipState extends State<SilkChip> {
                 widget.label,
                 style: tokens.captionStyle.copyWith(
                   color: fg,
-                  fontWeight:
-                      widget.selected ? FontWeight.w600 : FontWeight.w500,
+                  fontWeight: widget.selected
+                      ? FontWeight.w600
+                      : FontWeight.w500,
                 ),
               ),
               if (widget.onDelete != null) ...[

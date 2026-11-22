@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:silk/core/theme/context_tokens_extension.dart';
+import 'package:silk/shared/widgets/pressable_scale.dart';
 
 @immutable
 class SilkDialogAction {
@@ -102,34 +103,40 @@ class _SilkDialogWidget<T> extends StatelessWidget {
     final tokens = context.tokens;
 
     return Dialog(
-      backgroundColor: tokens.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(tokens.radiusLg),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(tokens.spaceLg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              title,
-              style: tokens.titleStyle,
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: tokens.spaceMd),
-            content,
-            if (actions.isNotEmpty) ...[
-              SizedBox(height: tokens.spaceLg),
-              Row(
-                children: [
-                  for (var i = 0; i < actions.length; i++) ...[
-                    if (i > 0) SizedBox(width: tokens.spaceSm),
-                    Expanded(child: _DialogButton(action: actions[i])),
-                  ],
-                ],
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: tokens.surface,
+          borderRadius: BorderRadius.circular(tokens.radiusLg),
+          boxShadow: tokens.shadowFloating,
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(tokens.spaceLg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: tokens.titleStyle,
+                textAlign: TextAlign.center,
               ),
+              SizedBox(height: tokens.spaceMd),
+              content,
+              if (actions.isNotEmpty) ...[
+                SizedBox(height: tokens.spaceLg),
+                Row(
+                  children: [
+                    for (var i = 0; i < actions.length; i++) ...[
+                      if (i > 0) SizedBox(width: tokens.spaceSm),
+                      Expanded(child: _DialogButton(action: actions[i])),
+                    ],
+                  ],
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -153,27 +160,28 @@ class _DialogButton extends StatelessWidget {
       fg = Colors.white;
     } else if (action.isPrimary) {
       bg = tokens.accent;
-      fg = Colors.white;
+      fg = tokens.onAccent;
     } else {
-      bg = tokens.surfaceMuted;
+      bg = tokens.surface;
       fg = tokens.onSurface;
     }
 
-    return GestureDetector(
+    final filled = action.isDestructive || action.isPrimary;
+
+    return PressableScale(
       onTap: action.onPressed,
+      haptic: action.isPrimary ? PressHaptic.light : PressHaptic.selection,
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: tokens.spaceMd),
+        constraints: const BoxConstraints(minHeight: 48),
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(tokens.radiusMd),
+          border: filled ? null : Border.all(color: tokens.hairlineStrong),
         ),
         alignment: Alignment.center,
         child: Text(
           action.label,
-          style: tokens.labelStyle.copyWith(
-            color: fg,
-            fontWeight: FontWeight.w600,
-          ),
+          style: tokens.titleSmStyle.copyWith(color: fg),
         ),
       ),
     );

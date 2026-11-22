@@ -29,7 +29,7 @@ class SilkChatBubble extends StatelessWidget {
     final isSender = side == SilkChatSide.sender;
 
     final bubbleColor = isSender ? tokens.accent : tokens.surfaceMuted;
-    final textColor = isSender ? Colors.white : tokens.onSurface;
+    final textColor = isSender ? tokens.onAccent : tokens.onSurface;
 
     final radius = BorderRadius.only(
       topLeft: Radius.circular(tokens.radiusLg),
@@ -68,7 +68,7 @@ class SilkChatBubble extends StatelessWidget {
                     timestamp!,
                     style: tokens.captionStyle.copyWith(
                       color: isSender
-                          ? Colors.white.withValues(alpha: 0.7)
+                          ? tokens.onAccent.withValues(alpha: 0.7)
                           : tokens.onSurfaceMuted,
                     ),
                   ),
@@ -77,7 +77,7 @@ class SilkChatBubble extends StatelessWidget {
                   IconTheme(
                     data: IconThemeData(
                       color: isSender
-                          ? Colors.white.withValues(alpha: 0.7)
+                          ? tokens.onAccent.withValues(alpha: 0.7)
                           : tokens.onSurfaceMuted,
                       size: 14,
                     ),
